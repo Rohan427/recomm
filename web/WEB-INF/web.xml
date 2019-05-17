@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- web-app id="WebApp_ID"
+		 version="4.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+		 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+		 				     http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+-->
+<web-app id="WebApp_ID" version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee                              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/applicationContext.xml</param-value>
+    </context-param>
+    <context-param>
+        <param-name>javax.faces.PROJECT_STAGE</param-name>
+        <param-value>Development</param-value>
+    </context-param>
+    <filter>
+        <filter-name>Tracking</filter-name>
+        <filter-class>filters.Tracking</filter-class>
+    </filter>
+    <filter>
+        <filter-name>Security</filter-name>
+        <filter-class>filters.Security</filter-class>
+    </filter>
+    <!-- filter>
+        <filter-name>Compression</filter-name>
+        <filter-class>filters.Compression</filter-class>
+    </filter -->
+    <filter-mapping>
+        <filter-name>Security</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>Tracking</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>Tracking</filter-name>
+        <url-pattern>/view/inventory/search.xhtml</url-pattern>
+    </filter-mapping>
+    <!-- filter-mapping>
+        <filter-name>Compression</filter-name>
+        <url-pattern>/index.xhtml</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>Compression</filter-name>
+        <url-pattern>/login.xhtml</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>Compression</filter-name>
+        <url-pattern>/style.css.xhtml</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>Compression</filter-name>
+        <url-pattern>/logout.xhtml</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>Compression</filter-name>
+        <url-pattern>/logoutResult.xhtml</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>Compression</filter-name>
+        <url-pattern>/regResult.xhtml</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>Compression</filter-name>
+        <url-pattern>/loginResult.xhtml</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>Compression</filter-name>
+        <url-pattern>/view/inventory/inventory.xhtml</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>Compression</filter-name>
+        <url-pattern>/view/inventory/addItem.xhtml</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>Compression</filter-name>
+        <url-pattern>/view/inventory/catalog.xhtml</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>Compression</filter-name>
+        <url-pattern>/view/inventory/main.xhtml</url-pattern>
+    </filter-mapping -->
+    <listener>
+        <description>sessionListener</description>
+        <listener-class>listeners.SessionListener</listener-class>
+    </listener>
+    <listener>
+        <description>contextListener</description>
+        <listener-class>listeners.ContextListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>
+            org.springframework.web.context.request.RequestContextListener
+        </listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>stdErr</servlet-name>
+        <servlet-class>model.business.error.stdErr</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>stdErr</servlet-name>
+        <url-pattern>/genError.xhtml</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+    <welcome-file-list>
+        <welcome-file>index.xhtml</welcome-file>
+    </welcome-file-list>
+    <security-constraint>
+        <display-name>admin</display-name>
+        <web-resource-collection>
+            <web-resource-name>Admin</web-resource-name>
+            <description/>
+            <url-pattern>/view/admin/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>Site Administration role</description>
+            <role-name>rladmin</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-role>
+        <description>Administrator role</description>
+        <role-name>rladmin</role-name>
+    </security-role>
+</web-app>

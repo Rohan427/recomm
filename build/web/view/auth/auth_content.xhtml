@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+<!--      xmlns:p="http://primefaces.org/ui"
+-->
+    <ui:composition>
+        <div class="res_div_header">
+            Login<ui:fragment rendered="#{expired}" >: Session Expired</ui:fragment>
+        </div>
+        <div class="res_div_main">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div style="width: 500px">
+                                <h:form>
+                                    <fieldset>
+                                        <legend><h1>Login</h1></legend>
+                                        <p class="form2">
+                                            Login<h:inputText class="frightc"
+                                                              value="#{loginBean.login}"
+                                                              required="true"
+                                                              requiredMessage="You must enter a Login"
+                                                              title="User Login"
+                                                              size="45"
+                                                />
+                                        </p>
+                                        <p class="form1">
+                                            Password<h:inputSecret class="frightc"
+                                                                   value="#{loginBean.password}"
+                                                                   required="true"
+                                                                   requiredMessage="You must enter a password, at least 8 charaters long"
+                                                                   title="User Password"
+                                                                   size="45"
+                                                     />
+                                        </p>
+                                        <p>
+                                            <h:commandButton value="Login" action="#{loginBean.login}" />&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <input type="reset"
+                                                   value="Reset"
+                                                   name="reset"
+                                            />
+                                        </p>
+                                    </fieldset>
+                                </h:form>
+                                    <p>
+                                        <a href="view/auth/forgotlogin.xhtml?pageTitle=Forgot Login">Forgot Login</a>&nbsp;&nbsp;
+                                        <a href="view/auth/forgotpassword.xhtml?pageTitle=Forgot Password">Forgot Password</a>
+                                    </p>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="width: 500px">
+                                <h:form>
+                                    <fieldset>
+                                        <legend><h1>Register</h1></legend>
+                                            <p class="form1">
+                                                Login<h:inputText class="frightc"
+                                                                  value="#{loginBean.login}"
+                                                                  required="true"
+                                                                  requiredMessage="You must enter a Login"
+                                                                  title="User Login"
+                                                                  size="45"
+                                                     />
+                                            </p>
+                                            <p class="form2">
+                                                First Name<h:inputText class="frightc"
+                                                                       value="#{loginBean.fname}"
+                                                                       required="true"
+                                                                       requiredMessage="You must enter a First Name"
+                                                                       title="First Name"
+                                                                       size="45"
+                                                          />
+                                            </p>
+                                            <p class="form1">
+                                                Last Name<h:inputText class="frightc"
+                                                                      value="#{loginBean.lname}"
+                                                                      required="true"
+                                                                      requiredMessage="You must enter a Last Name"
+                                                                      title="Last Name"
+                                                                      size="45"
+                                                         />
+                                            </p>
+                                            <p class="form2">
+                                                E-mail Address<h:inputText class="frightc"
+                                                                           value="#{loginBean.email}"
+                                                                           required="true"
+                                                                           requiredMessage="You must enter a valid E-mail address"
+                                                                           title="E-mail Address"
+                                                                           size="45"
+                                                              />
+                                            </p>
+                                            <p class="form1">
+                                                Password<h:inputSecret class="frightc"
+                                                                       value="#{loginBean.password}"
+                                                                       required="true"
+                                                                       requiredMessage="You must enter a password, at least 8 charaters long"
+                                                                       title="User Password"
+                                                                       size="45"
+                                                        />
+                                            </p>
+                                            <p class="form2">
+                                                Confirm Password<h:inputSecret class="frightc"
+                                                                               value="#{loginBean.cfmPassword}"
+                                                                               required="true"
+                                                                               requiredMessage="You must enter your password again"
+                                                                               title="Confirm Password"
+                                                                               size="45"
+                                                                />
+                                            </p>
+                                            <p>
+                                                <h:commandButton value="Register" 
+                                                                 action="#{loginBean.register}"
+                                                />&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <input type="reset"
+                                                       value="Reset"
+                                                       name="reset2"
+                                                />
+                                            </p>
+                                    </fieldset>
+                                </h:form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="res_div_main">
+            &nbsp;<br />
+        </div>
+
+        <p>
+            <small>&nbsp;</small>
+        </p>
+
+    </ui:composition>
+</html>
