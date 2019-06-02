@@ -15,8 +15,10 @@ import org.hibernate.SessionFactory;
 public interface IDAOService
 {
     public Session getSession();
-    
+
     public void loadService();
-    
+
     abstract SessionFactory getFactory();
+
+    void initSession();
 }

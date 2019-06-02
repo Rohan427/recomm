@@ -13,28 +13,24 @@ import model.service.interfaces.IItemAccessSvc;
 import model.domain.interfaces.IDomainObject;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Set;
+import model.business.error.Logger;
 import model.service.dao.HibernateSvc;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Service;
 
 /**
  * Item access service
- * 
+ *
  * @author Paul G. Allen <pgallen@gmail.com>
  */
 @Service
 public class ItemAccessSvcImpl extends HibernateSvc implements IItemAccessSvc, Serializable
 {
     private static final long serialVersionUID = 41L;
-    private final static Logger log = LogManager.getLogger (ItemAccessSvcImpl.class.getName());
 	private HashedObjectWrapper hashtable;
-		
+
     @Override
     public Collection<Items> readItems()
     {
@@ -42,26 +38,26 @@ public class ItemAccessSvcImpl extends HibernateSvc implements IItemAccessSvc, S
         Transaction transaction;
         Query query;
         Iterator<Items> iterator;
-        
+
         if (session == null)
         {
             loadService();
         }
-                
-        transaction = session.beginTransaction();        
+
+        transaction = session.beginTransaction();
         query = session.createQuery ("from Items");
         iterator = (Iterator<Items>)query.iterate();
-        
+
         while (iterator.hasNext())
         {
             items.add (iterator.next());
         }
-        
-        transaction.commit();        
-        
+
+        transaction.commit();
+
         return items;
     }
-    
+
         /**
      *
      * @param item
@@ -69,21 +65,23 @@ public class ItemAccessSvcImpl extends HibernateSvc implements IItemAccessSvc, S
      * @return
      */
     @Override
-	public boolean updateItem (Items item, boolean isUpdate) 
+	public boolean updateItem (Items item, boolean isUpdate)
 	{
 		boolean result;
-		
-		if (isUpdate)
-		{
-			// TODO: complete update code later
-			result = true;
-		}
-        else if (result = addObjectToHashtable (item))
+        Collection<Items> items = new ArrayList<Items>();
+
+        if (isUpdate)
         {
-            result = merge (hashtable);
+            // TODO: complete update code later
+            result = true;
         }
-		
-		return result;
+        else
+        {
+            items.add ((Items)item);
+            result = merge (items);
+        }
+
+        return result;
 	}
 
     /**
@@ -108,224 +106,220 @@ public class ItemAccessSvcImpl extends HibernateSvc implements IItemAccessSvc, S
 		// TODO Auto-generated method stub
 		return true;
 	}
-	
-    /**
-     *
-     * @param object
-     * @return
-     */
+
     @Override
-	public boolean addObjectToHashtable (IDomainObject object)
-	{
-		boolean result = false;
-        Hashtable<Integer, IDomainObject> localTable;
-		
-		//Instantiate a new table if none exists
-		if (hashtable == null)
-		{
-			hashtable = new HashedObjectWrapper();
-		}// else do nothing
-		
-		//validate input
-		if (object != null && object instanceof Items)
-		{
-			Items item = (Items)object;
-            localTable = hashtable.getHashtable();
-			localTable.put (item.getIdItems(), item);
-            hashtable.setHashtable (localTable);
-			result = true;
-		}// else do nothing
-		
-		return result;
-	}
-	
-    /**
-     *
-     * @return
-     */
-    @Override
-	public HashedObjectWrapper getHashtable()
-	{
-		return hashtable;
-	}
-	
-    /**
-     *
-     * @param hashtable
-     * @return
-     */
-    @Override
-	public boolean persist (HashedObjectWrapper object)
-	{
-		boolean result = true;
-        Transaction transaction;
-        Items newItem;
-        Iterator iterator;
-        Hashtable<Integer, IDomainObject> itemTable;
-        Collection<Items> items = new ArrayList<>();
-        
-		if (object != null)//validate
-		{
-			this.hashtable = object;
-            
-            if (session == null)
-            {
-                loadService();
-            }
-        
-            transaction = session.beginTransaction();            
-            itemTable = hashtable.getHashtable();
-            Set<Integer> keys = itemTable.keySet();
-            
-            keys.forEach ((key) ->
-            {
-                Items item = (Items)itemTable.get (key);                                
-                items.add (item);
-            });
-			
-            iterator = items.iterator();
-            
-            while (iterator.hasNext() && result)
-            {
-                newItem = (Items)iterator.next();
-                session.persist (newItem);
-            }
-            
-            transaction.commit();
-		}
-		// else do nothing
-		
-		return result;
-	}
-    
-    public boolean save (HashedObjectWrapper object)
+    public boolean save (Collection<?> object)
     {
         boolean result = true;
-        Transaction transaction;
+        Transaction transaction = null;
         Items newItem;
         Iterator iterator;
-        Hashtable<Integer, IDomainObject> itemTable;
-        Collection<Items> items = new ArrayList<>();
-        
+        Collection<Items> items;
+
 		if (object != null)//validate
 		{
-			this.hashtable = object;
-            
-            if (session == null)
+            items = (Collection<Items>) object;
+            initSession();
+
+            if (session != null)
             {
-                loadService();
+                try
+                {
+                    transaction = session.beginTransaction();
+                    iterator = items.iterator();
+
+                    while (iterator.hasNext() && result)
+                    {
+                        newItem = (Items)iterator.next();
+                        session.save (newItem);
+                    }
+
+                    transaction.commit();
+                }
+                catch (Exception e)
+                {
+                    result = false;
+
+                    if (transaction != null)
+                    {
+                        try
+                        {
+                            Logger.log (UserAccessSvcImpl.class, e);
+                            transaction.rollback();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.log (ItemAccessSvcImpl.class, "Rollback() failed");
+                        }
+                    }
+                }
             }
-        
-            transaction = session.beginTransaction();
-            
-            itemTable = hashtable.getHashtable();
-            Set<Integer> keys = itemTable.keySet();
-            
-            keys.forEach ((key) ->
+            else
             {
-                Items item = (Items)itemTable.get (key);                                
-                items.add (item);
-            });
-			
-            iterator = items.iterator();
-            
-            while (iterator.hasNext() && result)
-            {
-                newItem = (Items)iterator.next();
-                session.save (newItem);
+                Logger.log (ItemAccessSvcImpl.class, "ItemAccessSvcImpl.save failed with a NULL session.");
+                result = false;
             }
-            
-            transaction.commit();
 		}
-		// else do nothing
-		
+        else
+        {
+            Logger.log (ItemAccessSvcImpl.class, "ItemAccessSvcImpl.persist failed with a NULL object.");
+            result = false;
+        }
+
 		return result;
     }
-	
+
     /**
      *
      * @param object
      * @return
      */
     @Override
-	public IDomainObject find (IDomainObject object)
+	public Collection<Items> find (IDomainObject object)
 	{
-		Transaction transaction;
         Items item = (Items)object;
-        
+        Iterator userItr;
+        Object[] userObject;
+        Collection<Items> items = new ArrayList<Items>();
+
         if (session == null)
         {
             loadService();
         }
-                
-        transaction = session.beginTransaction();
+
         object = (Items)session.get (Items.class, item.getIdItems());
-        transaction.commit();
-        		
-		return object;
+
+		return items;
 	}
-    
+
     @Override
     public boolean delete (String type)
     {
         boolean result = false;
         Transaction transaction;
-        
+
         if (session == null)
         {
             loadService();
         }
-        
+
         transaction = session.beginTransaction();
         session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
         session.createSQLQuery ("TRUNCATE Items").executeUpdate();
-        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();        
+        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
         transaction.commit();
         result = true;
-        
+
         return result;
     }
-    
-    public boolean merge (HashedObjectWrapper object)
+
+    @Override
+    public boolean persist (Collection<?> object)
+	{
+		boolean result = true;
+        Transaction transaction = null;
+        Items newItem;
+        Iterator iterator;
+        Collection<Items> items;
+
+		if (object != null)//validate
+		{
+            items = (Collection<Items>) object;
+            initSession();
+
+            if (session != null)
+            {
+                try
+                {
+                    transaction = session.beginTransaction();
+                    iterator = items.iterator();
+
+                    while (iterator.hasNext() && result)
+                    {
+                        newItem = (Items)iterator.next();
+                        session.persist (newItem);
+                    }
+
+                    transaction.commit();
+                }
+                catch (Exception e)
+                {
+                    result = false;
+
+                    if (transaction != null)
+                    {
+                        try
+                        {
+                            Logger.log (ItemAccessSvcImpl.class, e);
+                            transaction.rollback();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.log (ItemAccessSvcImpl.class, "Rollback() failed");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Logger.log (ItemAccessSvcImpl.class, "ItemAccessSvcImpl.persist failed with a NULL session.");
+            }
+		}
+        else
+        {
+            Logger.log (ItemAccessSvcImpl.class, "ItemAccessSvcImpl.persist failed with a NULL object.");
+            result = false;
+        }
+
+		return result;
+    }
+
+    @Override
+    public boolean merge (Collection<?> object)
     {
         boolean result = true;
         Transaction transaction;
         Items newItem;
         Iterator iterator;
-        Hashtable<Integer, IDomainObject> itemTable;
-        Collection<Items> items = new ArrayList<>();
-        
-		if (object != null)//validate
-		{
-			this.hashtable = object;
-            
-            if (session == null)
+        Collection<Items> items;
+
+        if (object != null)//validate
+        {
+            items = (Collection<Items>) object;
+            initSession();
+
+            if (session != null)
             {
-                loadService();
+                try
+                {
+                    transaction = session.beginTransaction();
+                    iterator = items.iterator();
+
+                    while (iterator.hasNext() && result)
+                    {
+                        newItem = (Items)iterator.next();
+                        session.merge (newItem);
+                    }
+
+                    transaction.commit();
+                }
+                catch (Exception e)
+                {
+                    Logger.log (ItemAccessSvcImpl.class, e);
+                }
             }
-        
-            transaction = session.beginTransaction();            
-            itemTable = hashtable.getHashtable();
-            Set<Integer> keys = itemTable.keySet();
-            
-            keys.forEach ((key) ->
+            else
             {
-                Items item = (Items)itemTable.get (key);                                
-                items.add (item);
-            });
-			
-            iterator = items.iterator();
-            
-            while (iterator.hasNext() && result)
-            {
-                newItem = (Items)iterator.next();
-                session.merge (newItem);
+                Logger.log (ItemAccessSvcImpl.class, "ItemAccessSvcImpl.merge failed with a NULL session.");
+                result = false;
             }
-            
-            transaction.commit();
-		}
-		// else do nothing
-		
-		return result;
+        }
+        else
+        {
+            Logger.log (ItemAccessSvcImpl.class, "ItemAccessSvcImpl.merge failed with a NULL object.");
+            result = false;
+        }
+
+        return result;
     }
 }

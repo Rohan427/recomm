@@ -35,7 +35,7 @@ import org.hibernate.annotations.Proxy;
  */
 @Entity
 @Proxy(lazy=false)
-@Table (catalog = "customer", schema = "", uniqueConstraints =
+@Table (name = "users", catalog = "customer", schema = "", uniqueConstraints =
         {
             @UniqueConstraint (columnNames =
             {
@@ -63,18 +63,19 @@ public class Users extends IUsers implements Serializable
     private String secretKey;
 
 
-    private Integer a;
+    private Integer a = null;
+    private Integer a1 = null;
+    private String a2 = null;
 
-    private String a2;
+    private Integer b = null;
+    private Integer b1 = null;
+    private String b2 = null;
 
+    private Integer c = null;
+    private Integer c1 = null;
+    private String c2 = null;
 
-    private Integer b;
-
-
-    private Integer c;
-
-
-    private Integer d;
+    private Integer d = null;
 
     @Basic(optional = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -138,6 +139,86 @@ public class Users extends IUsers implements Serializable
         this.c = c;
         this.d = d;
         this.creation = creation;
+    }
+
+    /**
+     * @return the a1
+     */
+    public Integer getA1()
+    {
+        return a1;
+    }
+
+    /**
+     * @param a1 the a1 to set
+     */
+    public void setA1(Integer a1)
+    {
+        this.a1 = a1;
+    }
+
+    /**
+     * @return the b1
+     */
+    public Integer getB1()
+    {
+        return b1;
+    }
+
+    /**
+     * @param b1 the b1 to set
+     */
+    public void setB1 (Integer b1)
+    {
+        this.b1 = b1;
+    }
+
+    /**
+     * @return the b2
+     */
+    public String getB2()
+    {
+        return b2;
+    }
+
+    /**
+     * @param b2 the b2 to set
+     */
+    public void setB2 (String b2)
+    {
+        this.b2 = b2;
+    }
+
+    /**
+     * @return the c1
+     */
+    public Integer getC1()
+    {
+        return c1;
+    }
+
+    /**
+     * @param c1 the c1 to set
+     */
+    public void setC1 (Integer c1)
+    {
+        this.c1 = c1;
+    }
+
+    /**
+     * @return the c2
+     */
+    public String getC2()
+    {
+        return c2;
+    }
+
+    /**
+     * @param c2 the c2 to set
+     */
+    public void setC2 (String c2)
+    {
+        this.c2 = c2;
     }
 
     @Override

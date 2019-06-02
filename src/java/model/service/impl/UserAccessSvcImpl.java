@@ -9,17 +9,22 @@ import model.domain.users.Users;
 import model.service.dao.HashedObjectWrapper;
 import model.service.interfaces.IUserAccessSvc;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import model.business.error.Logger;
 import model.domain.interfaces.IUsers;
 import model.service.dao.HibernateSvc;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
+import org.hibernate.query.NativeQuery;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,165 +35,227 @@ import org.springframework.stereotype.Service;
 public class UserAccessSvcImpl extends HibernateSvc implements IUserAccessSvc, Serializable
 {
     private static final long serialVersionUID = 43L;
-    private final static Logger log = LogManager.getLogger (UserAccessSvcImpl.class.getName());
     private HashedObjectWrapper hashtable = null;
-    
-    @Override
-    public boolean addObjectToHashtable (IDomainObject object)
-	{
-		boolean result = false;
-		
-		//Instantiate a new table if none exists
-		if (hashtable == null)
-		{
-			hashtable = new HashedObjectWrapper();
-		}
-		// else do nothing
-		
-		//validate input
-		if (object != null && object instanceof Users)
-		{
-			Users user = (Users)object;
-            hashtable.getHashtable().put (user.getIdUsers(), user);
-			result = true;
-		}
-		// else do nothing
-		
-		return result;
-	}
 
     @Override
     public boolean delete (String type)
     {
         boolean result = false;
         Transaction transaction;
-        
-        if (session == null)
-        {
-            loadService();
-        }
-        
-        transaction = session.beginTransaction();
-        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
-        session.createSQLQuery ("TRUNCATE Users").executeUpdate();
-        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
-        
-        transaction.commit();
-        result = true;
-        
+
+////        if (session == null)
+////        {
+////            loadService();
+////        }
+////
+////        transaction = session.beginTransaction();
+////        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
+////        session.createSQLQuery ("TRUNCATE Users").executeUpdate();
+////        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
+////
+////        transaction.commit();
+////        result = true;
+
         return result;
     }
 
     @Override
-    public IDomainObject find (IDomainObject object)
+    public Collection<Users> find (IDomainObject object)
     {
-        Transaction transaction;
-        Users user = (Users)object;
-        
-        if (session == null)
+        Users user = null;
+        String query = null;
+        NativeQuery result;
+        List<Object[]> resultSet;
+        initSession();
+        Iterator userItr;
+        Object[] userObject;
+        Collection<Users> users= new ArrayList<Users>();
+
+        if (session != null)
         {
-            loadService();
+            user = (Users)object;
+            query = "SELECT * FROM users WHERE UserName = '"
+                  + user.getUserName() + "'";
+            try
+            {
+                result = session.createSQLQuery (query);
+                resultSet = (List<Object[]>)result.list();
+
+                if (!resultSet.isEmpty())
+                {
+                    userItr = resultSet.iterator();
+
+                    do
+                    {
+                        userObject = (Object[])userItr.next();
+                        DateFormat format = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss.SSS", Locale.ENGLISH);
+                        Date date;
+                        user.setIdUsers (Integer.parseInt (userObject[0].toString()));
+                        user.setFirst (userObject[1].toString());
+                        user.setLast (userObject[2].toString());
+                        user.setUserName (userObject[3].toString());
+                        user.setSecretKey (userObject[4].toString());
+
+                        user.setA (Integer.parseInt (userObject[5].toString()));
+                        user.setA1 (Integer.parseInt (userObject[6].toString()));
+                        user.setA2 (userObject[7].toString());
+
+                        user.setB (Integer.parseInt (userObject[8].toString()));
+                        user.setB1 (Integer.parseInt (userObject[9].toString()));
+                        user.setB2 (userObject[10].toString());
+
+                        user.setC (Integer.parseInt (userObject[11].toString()));
+                        user.setC1 (Integer.parseInt (userObject[12].toString()));
+                        user.setC2 (userObject[13].toString());
+
+                        user.setD (Integer.parseInt (userObject[14].toString()));
+                        user.setPwReset (Boolean.parseBoolean (userObject[15].toString()));
+
+                        date = format.parse (userObject[16].toString());
+                        user.setCreation (date);
+
+                        users.add (user);
+                    } while (userItr.hasNext());
+                }
+                else
+                {
+                    users = null;
+                }
+            }
+            catch (Exception e)
+            {
+                users = null;
+                Logger.log (UserAccessSvcImpl.class, e);
+            }
         }
-                
-        transaction = session.beginTransaction();
-        object = (Users)session.get (Users.class, user.getIdUsers());
-        transaction.commit();
-		
-		return object;
+        else
+        {
+            Logger.log (UserAccessSvcImpl.class, "UserAccessSvcImpl.find failed with a NULL session.");
+        }
+
+        return users;
     }
 
     @Override
-    public HashedObjectWrapper getHashtable()
-    {
-        return hashtable;
-    }
-
-    @Override
-    public boolean persist (HashedObjectWrapper object)
+    public boolean persist (Collection<?> object)
     {
         boolean result = true;
-        Transaction transaction;
+        Transaction transaction = null;
         Users newUser;
         Iterator iterator;
-        Hashtable<Integer, IDomainObject> usersTable;
-        Collection<Users> users = new ArrayList<>();
-        
+        Collection<Users> users;
+
 		if (object != null)//validate
 		{
-			this.hashtable = object;
-            
-            if (session == null)
+            users = (Collection<Users>) object;
+            initSession();
+
+            if (session != null)
             {
-                loadService();
+                try
+                {
+                    transaction = session.beginTransaction();
+                    iterator = users.iterator();
+
+                    while (iterator.hasNext() && result)
+                    {
+                        newUser = (Users)iterator.next();
+                        session.persist (newUser);
+                    }
+
+                    transaction.commit();
+                }
+                catch (Exception e)
+                {
+                    result = false;
+
+                    if (transaction != null)
+                    {
+                        try
+                        {
+                            Logger.log (UserAccessSvcImpl.class, e);
+                            transaction.rollback();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.log (UserAccessSvcImpl.class, "Rollback() failed");
+                        }
+                    }
+                }
             }
-        
-            transaction = session.beginTransaction();
-            
-            usersTable = hashtable.getHashtable();
-            Set<Integer> keys = usersTable.keySet();
-            
-            keys.forEach ((key) ->
+            else
             {
-                Users user = (Users)usersTable.get (key);                                
-                users.add (user);
-            });
-			
-            iterator = users.iterator();
-            
-            while (iterator.hasNext() && result)
-            {
-                newUser = (Users)iterator.next();
-                session.persist (newUser);
+                Logger.log (UserAccessSvcImpl.class, "UserAccessSvcImpl.persist failed with a NULL session.");
             }
-            
-            transaction.commit();
 		}
-		// else do nothing
-		
+        else
+        {
+            Logger.log (UserAccessSvcImpl.class, "UserAccessSvcImpl.persist failed with a NULL object.");
+            result = false;
+        }
+
 		return result;
     }
-    
-    public boolean save (HashedObjectWrapper object)
+
+    @Override
+    public boolean save (Collection<?> object)
     {
         boolean result = true;
-        Transaction transaction;
+        Transaction transaction = null;
         Users newUser;
         Iterator iterator;
-        Hashtable<Integer, IDomainObject> usersTable;
-        Collection<Users> users = new ArrayList<>();
-        
+        Collection<Users> users;
+
 		if (object != null)//validate
 		{
-			this.hashtable = object;
-            
-            if (session == null)
+            users = (Collection<Users>) object;
+            initSession();
+
+            if (session != null)
             {
-                loadService();
+                try
+                {
+                    transaction = session.beginTransaction();
+                    iterator = users.iterator();
+
+                    while (iterator.hasNext() && result)
+                    {
+                        newUser = (Users)iterator.next();
+                        session.save (newUser);
+                    }
+
+                    transaction.commit();
+                }
+                catch (Exception e)
+                {
+                    result = false;
+
+                    if (transaction != null)
+                    {
+                        try
+                        {
+                            Logger.log (UserAccessSvcImpl.class, e);
+                            transaction.rollback();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.log (UserAccessSvcImpl.class, "Rollback() failed");
+                        }
+                    }
+                }
             }
-        
-            transaction = session.beginTransaction();
-            
-            usersTable = hashtable.getHashtable();
-            Set<Integer> keys = usersTable.keySet();
-            
-            keys.forEach ((key) ->
+            else
             {
-                Users user = (Users)usersTable.get (key);                                
-                users.add (user);
-            });
-			
-            iterator = users.iterator();
-            
-            while (iterator.hasNext() && result)
-            {
-                newUser = (Users)iterator.next();
-                session.save (newUser);
+                Logger.log (UserAccessSvcImpl.class, "UserAccessSvcImpl.save failed with a NULL session.");
+                result = false;
             }
-            
-            transaction.commit();
 		}
-		// else do nothing
-		
+        else
+        {
+            Logger.log (UserAccessSvcImpl.class, "UserAccessSvcImpl.persist failed with a NULL object.");
+            result = false;
+        }
+
 		return result;
     }
 
@@ -202,26 +269,32 @@ public class UserAccessSvcImpl extends HibernateSvc implements IUserAccessSvc, S
     public Collection<Users> readUsers()
     {
         Collection<Users> users = new ArrayList<Users>();
-        Transaction transaction;
-        Query query;
+        org.hibernate.query.Query query;
         Iterator<Users> iterator;
-        
-        if (session == null)
+        initSession();
+
+        if (session != null)
         {
-            loadService();
+            try
+            {
+                query = session.createQuery ("from users");
+                iterator = (Iterator<Users>)query.iterate();
+
+                while (iterator.hasNext())
+                {
+                    users.add (iterator.next());
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.log (UserAccessSvcImpl.class, e);
+            }
         }
-               
-        transaction = session.beginTransaction();        
-        query = session.createQuery ("from Users");
-        iterator = (Iterator<Users>)query.iterate();
-        
-        while (iterator.hasNext())
+        else
         {
-            users.add (iterator.next());
+            Logger.log (UserAccessSvcImpl.class, "UserAccessSvcImpl.readUsers failed with a NULL session.");
         }
 
-        transaction.commit();
-        
         return users;
     }
 
@@ -235,60 +308,68 @@ public class UserAccessSvcImpl extends HibernateSvc implements IUserAccessSvc, S
     public boolean updateUser (IUsers user, boolean isUpdate)
     {
         boolean result;
-		
-		if (isUpdate)
-		{
-			// TODO: complete update code later
-			result = true;
-		}
-        else if (result = addObjectToHashtable (user))
+        Collection<Users> users = new ArrayList<Users>();
+
+        if (isUpdate)
         {
-            result = merge (hashtable);
+            // TODO: complete update code later
+            result = true;
         }
-		
-		return result;
+        else
+        {
+            users.add ((Users)user);
+            result = merge (users);
+        }
+
+        return result;
     }
-    
-    public boolean merge (HashedObjectWrapper object)
+
+    @Override
+    public boolean merge (Collection<?> object)
     {
         boolean result = true;
         Transaction transaction;
         Users newUser;
         Iterator iterator;
-        Hashtable<Integer, IDomainObject> usersTable;
-        Collection<Users> users = new ArrayList<>();
-        
-		if (object != null)//validate
-		{
-			this.hashtable = object;
-            
-            if (session == null)
+        Collection<Users> users;
+
+        if (object != null)//validate
+        {
+            users = (Collection<Users>) object;
+            initSession();
+
+            if (session != null)
             {
-                loadService();
+                try
+                {
+                    transaction = session.beginTransaction();
+                    iterator = users.iterator();
+
+                    while (iterator.hasNext() && result)
+                    {
+                        newUser = (Users)iterator.next();
+                        session.merge (newUser);
+                    }
+
+                    transaction.commit();
+                }
+                catch (Exception e)
+                {
+                    Logger.log (UserAccessSvcImpl.class, e);
+                }
             }
-        
-            transaction = session.beginTransaction();            
-            usersTable = hashtable.getHashtable();
-            Set<Integer> keys = usersTable.keySet();
-            
-            keys.forEach ((key) ->
+            else
             {
-                Users user = (Users)usersTable.get (key);
-                users.add (user);
-            });
-			
-            iterator = users.iterator();
-            
-            while (iterator.hasNext() && result)
-            {
-                newUser = (Users)iterator.next();
-                session.merge (newUser);
+                Logger.log (UserAccessSvcImpl.class, "UserAccessSvcImpl.merge failed with a NULL session.");
+                result = false;
             }
-            
-            transaction.commit();
-		}
-		// else do nothing
-		
-		return result;
+        }
+        else
+        {
+            Logger.log (UserAccessSvcImpl.class, "UserAccessSvcImpl.merge failed with a NULL object.");
+            result = false;
+        }
+
+        return result;
     }
 }

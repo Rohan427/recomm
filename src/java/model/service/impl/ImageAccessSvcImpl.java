@@ -7,29 +7,25 @@ import model.service.dao.HashedObjectWrapper;
 import model.service.interfaces.IImageAccessSvc;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Set;
 import model.domain.interfaces.IDomainObject;
 import java.util.Iterator;
+import model.business.error.Logger;
 import model.service.dao.HibernateSvc;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Service;
 
 /**
  * Image access service
- * 
+ *
  * @author Paul G. Allen <pgallen@gmail.com>
  */
 @Service
 public class ImageAccessSvcImpl extends HibernateSvc implements IImageAccessSvc, Serializable
 {
     private static final long serialVersionUID = 44L;
-    private final static Logger log = LogManager.getLogger (ImageAccessSvcImpl.class.getName());
 	private HashedObjectWrapper hashtable;
-    
+
     /**
      *
      * @return
@@ -41,27 +37,27 @@ public class ImageAccessSvcImpl extends HibernateSvc implements IImageAccessSvc,
         Transaction transaction;
         Query query;
         Iterator<Images> iterator;
-        
+
         if (session == null)
         {
             loadService();
         }
         // else do nothing
-               
-        transaction = session.beginTransaction();        
+
+        transaction = session.beginTransaction();
         query = session.createQuery ("from Images");
         iterator = (Iterator<Images>)query.iterate();
-        
+
         while (iterator.hasNext())
         {
             images.add (iterator.next());
         }
 
         transaction.commit();
-        
+
         return images;
     }
-		
+
     /**
      *
      * @param image
@@ -69,22 +65,24 @@ public class ImageAccessSvcImpl extends HibernateSvc implements IImageAccessSvc,
      * @return
      */
     @Override
-	public boolean updateImage (Images image, boolean isUpdate) 
+	public boolean updateImage (Images image, boolean isUpdate)
 	{
 		boolean result;
-		
-		if (isUpdate)
-		{
-			// TODO: complete update code later
-			result = true;
-		}
-        else if (result = addObjectToHashtable (image))
+        Collection<Images> images = new ArrayList<Images>();
+
+        if (isUpdate)
         {
-            result = merge (hashtable);
+            // TODO: complete update code later
+            result = true;
         }
-		
-		return result;
-	}
+        else
+        {
+            images.add ((Images)image);
+            result = merge (images);
+        }
+
+        return result;
+    }
 
     /**
      *
@@ -115,219 +113,216 @@ public class ImageAccessSvcImpl extends HibernateSvc implements IImageAccessSvc,
      * @return
      */
     @Override
-	public boolean addObjectToHashtable (IDomainObject object)
+	public Collection<Images> find (IDomainObject object)
 	{
-		boolean result = false;
-		
-		//Instantiate a new table if none exists
-		if (hashtable == null)
-		{
-			hashtable = new HashedObjectWrapper();
-		}
-		// else do nothing
-		
-		//validate input
-		if (object != null && object instanceof Images)
-		{
-			Images image = (Images)object;
-			hashtable.getHashtable().put (image.getIdImages(), image);
-			result = true;
-		}
-		// else do nothing
-		
-		return result;
-	}
-	
-    /**
-     *
-     * @return
-     */
-    @Override
-	public HashedObjectWrapper getHashtable()
-	{
-		return hashtable;
-	}
-	
-    @Override
-	public boolean persist (HashedObjectWrapper object)
-	{
-		boolean result = true;
-        Transaction transaction;
-        Images newImage;
-        Iterator iterator;
-        Hashtable<Integer, IDomainObject> brandTable;
-        Collection<Images> brands = new ArrayList<>();
-        
-		if (object != null)//validate
-		{
-			this.hashtable = object;
-            
-            if (session == null)
-            {
-                loadService();
-            }
-            // else do nothing
-        
-            transaction = session.beginTransaction();
-            
-            brandTable = hashtable.getHashtable();
-            Set<Integer> keys = brandTable.keySet();
-            
-            keys.forEach ((key) ->
-            {
-                Images brand = (Images)brandTable.get (key);                                
-                brands.add (brand);
-            });
-			
-            iterator = brands.iterator();
-            
-            while (iterator.hasNext() && result)
-            {
-                newImage = (Images)iterator.next();
-                session.persist (newImage);
-            }
-            
-            transaction.commit();
-		}
-		// else do nothing
-		
-		return result;
-	}
-    
-    public boolean save (HashedObjectWrapper object)
-    {
-        boolean result = true;
-        Transaction transaction;
-        Images newImage;
-        Iterator iterator;
-        Hashtable<Integer, IDomainObject> imageTable;
-        Collection<Images> images = new ArrayList<>();
-        
-		if (object != null)//validate
-		{
-			this.hashtable = object;
-            
-            if (session == null)
-            {
-                loadService();
-            }
-            // else do nothing
-        
-            transaction = session.beginTransaction();
-            
-            imageTable = hashtable.getHashtable();
-            Set<Integer> keys = imageTable.keySet();
-            
-            keys.forEach ((key) ->
-            {
-                Images image = (Images)imageTable.get (key);                                
-                images.add (image);
-            });
-			
-            iterator = images.iterator();
-            
-            while (iterator.hasNext() && result)
-            {
-                newImage = (Images)iterator.next();
-                session.save (newImage);
-            }
-            
-            transaction.commit();
-		}
-		// else do nothing
-		
-		return result;
-    }
-	
-    /**
-     *
-     * @param object
-     * @return
-     */
-    @Override
-	public IDomainObject find (IDomainObject object)
-	{
-		Transaction transaction;
         Images image = (Images)object;
-        
+        Iterator userItr;
+        Object[] userObject;
+        Collection<Images> images = new ArrayList<Images>();
+
         if (session == null)
         {
             loadService();
         }
         // else do nothing
-               
-        transaction = session.beginTransaction();
+
         object = (Images)session.get (Images.class, image.getIdImages());
-        transaction.commit();
-		
-		return object;
+
+		return images;
 	}
-    
+
     @Override
     public boolean delete (String type)
     {
         boolean result = false;
         Transaction transaction;
-        
+
         if (session == null)
         {
             loadService();
         }
         // else do nothing
-        
+
         transaction = session.beginTransaction();
         session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
         session.createSQLQuery ("TRUNCATE Images").executeUpdate();
         session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
-        
+
         transaction.commit();
         result = true;
-        
+
         return result;
     }
-    
-    public boolean merge (HashedObjectWrapper object)
+
+    @Override
+    public boolean persist (Collection<?> object)
+	{
+		boolean result = true;
+        Transaction transaction = null;
+        Images newImage;
+        Iterator iterator;
+        Collection<Images> images;
+
+		if (object != null)//validate
+		{
+            images = (Collection<Images>) object;
+            initSession();
+
+            if (session != null)
+            {
+                try
+                {
+                    transaction = session.beginTransaction();
+                    iterator = images.iterator();
+
+                    while (iterator.hasNext() && result)
+                    {
+                        newImage = (Images)iterator.next();
+                        session.persist (newImage);
+                    }
+
+                    transaction.commit();
+                }
+                catch (Exception e)
+                {
+                    result = false;
+
+                    if (transaction != null)
+                    {
+                        try
+                        {
+                            Logger.log (ImageAccessSvcImpl.class, e);
+                            transaction.rollback();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.log (ImageAccessSvcImpl.class, "Rollback() failed");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Logger.log (ImageAccessSvcImpl.class, "ImageAccessSvcImpl.persist failed with a NULL session.");
+            }
+		}
+        else
+        {
+            Logger.log (ImageAccessSvcImpl.class, "ImageAccessSvcImpl.persist failed with a NULL object.");
+            result = false;
+        }
+
+		return result;
+    }
+
+    @Override
+    public boolean save (Collection<?> object)
+    {
+        boolean result = true;
+        Transaction transaction = null;
+        Images newImage;
+        Iterator iterator;
+        Collection<Images> images;
+
+		if (object != null)//validate
+		{
+            images = (Collection<Images>) object;
+            initSession();
+
+            if (session != null)
+            {
+                try
+                {
+                    transaction = session.beginTransaction();
+                    iterator = images.iterator();
+
+                    while (iterator.hasNext() && result)
+                    {
+                        newImage = (Images)iterator.next();
+                        session.save (newImage);
+                    }
+
+                    transaction.commit();
+                }
+                catch (Exception e)
+                {
+                    result = false;
+
+                    if (transaction != null)
+                    {
+                        try
+                        {
+                            Logger.log (ImageAccessSvcImpl.class, e);
+                            transaction.rollback();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.log (ImageAccessSvcImpl.class, "Rollback() failed");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Logger.log (ImageAccessSvcImpl.class, "ImageAccessSvcImpl.save failed with a NULL session.");
+                result = false;
+            }
+		}
+        else
+        {
+            Logger.log (ImageAccessSvcImpl.class, "ImageAccessSvcImpl.persist failed with a NULL object.");
+            result = false;
+        }
+
+		return result;
+    }
+
+    @Override
+    public boolean merge (Collection<?> object)
     {
         boolean result = true;
         Transaction transaction;
         Images newImage;
         Iterator iterator;
-        Hashtable<Integer, IDomainObject> imageTable;
-        Collection<Images> brands = new ArrayList<>();
-        
-		if (object != null)//validate
-		{
-			this.hashtable = object;
-            
-            if (session == null)
+        Collection<Images> images;
+
+        if (object != null)//validate
+        {
+            images = (Collection<Images>) object;
+            initSession();
+
+            if (session != null)
             {
-                loadService();
+                try
+                {
+                    transaction = session.beginTransaction();
+                    iterator = images.iterator();
+
+                    while (iterator.hasNext() && result)
+                    {
+                        newImage = (Images)iterator.next();
+                        session.merge (newImage);
+                    }
+
+                    transaction.commit();
+                }
+                catch (Exception e)
+                {
+                    Logger.log (ImageAccessSvcImpl.class, e);
+                }
             }
-            // else do nothing
-        
-            transaction = session.beginTransaction();
-            
-            imageTable = hashtable.getHashtable();
-            Set<Integer> keys = imageTable.keySet();
-            
-            keys.forEach ((key) ->
+            else
             {
-                Images brand = (Images)imageTable.get (key);                                
-                brands.add (brand);
-            });
-			
-            iterator = brands.iterator();
-            
-            while (iterator.hasNext() && result)
-            {
-                newImage = (Images)iterator.next();
-                session.merge (newImage);
+                Logger.log (ImageAccessSvcImpl.class, "ImageAccessSvcImpl.merge failed with a NULL session.");
+                result = false;
             }
-            
-            transaction.commit();
-		}
-		// else do nothing
-		
-		return result;
+        }
+        else
+        {
+            Logger.log (ImageAccessSvcImpl.class, "ImageAccessSvcImpl.merge failed with a NULL object.");
+            result = false;
+        }
+
+        return result;
     }
 }

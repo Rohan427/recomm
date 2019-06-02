@@ -19,6 +19,7 @@ import model.service.interfaces.IPriceAccessSvc;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import model.business.interfaces.IInventoryManager;
+import model.domain.interfaces.IDomainObject;
 import model.domain.interfaces.IUsers;
 import model.domain.users.Users;
 import model.service.interfaces.IUserAccessSvc;
@@ -33,22 +34,22 @@ import org.springframework.stereotype.Component;
 @ManagedBean
 @SessionScoped
 public class InventoryManager implements IInventoryManager, Serializable
-{	
+{
 	/** The manager. */
     private final static Logger log = LogManager.getLogger (InventoryManager.class.getName());
-    
+
     @Autowired
     private IPriceAccessSvc priceSvc;
-    
+
     @Autowired
     private IBrandAccessSvc brandSvc;
-    
+
     @Autowired
     private IImageAccessSvc imageSvc;
-    
+
     @Autowired
     private IUserAccessSvc userSvc;
-    
+
     @Autowired
     private IItemAccessSvc itemSvc;
 
@@ -56,37 +57,72 @@ public class InventoryManager implements IInventoryManager, Serializable
 	 * Instantiates a new inventory manager.
 	 */
 	public InventoryManager() {}
-	
+
     @Override
     public void setPriceSvc (IPriceAccessSvc priceSvc)
     {
         this.priceSvc = priceSvc;
     }
-    
+
     @Override
     public void setBrandSvc (IBrandAccessSvc brandSvc)
     {
         this.brandSvc = brandSvc;
     }
-    
+
     @Override
     public void setImageSvc (IImageAccessSvc imageSvc)
     {
         this.imageSvc = imageSvc;
     }
-    
+
     @Override
     public void setUserSvc (IUserAccessSvc userSvc)
     {
         this.userSvc = userSvc;
     }
-    
+
     @Override
     public void setItemSvc (IItemAccessSvc itemSvc)
     {
         this.itemSvc = itemSvc;
     }
-	
+
+    @Override
+    public synchronized Collection<?> find (String type, IDomainObject Object)
+    {
+        Collection<?> objectList = null;
+
+        switch (type)
+		{
+			case "item":
+				objectList = itemSvc.find (Object);
+				break;
+
+			case "price":
+				objectList = priceSvc.find (Object);
+				break;
+
+			case "brand":
+				objectList = brandSvc.find (Object);
+				break;
+
+			case "image":
+				objectList = imageSvc.find (Object);
+				break;
+
+            case "user":
+				objectList = userSvc.find (Object);
+				break;
+
+			default:
+				break;
+		}
+
+
+        return objectList;
+    }
+
     /**
      *
      * @param type
@@ -96,37 +132,37 @@ public class InventoryManager implements IInventoryManager, Serializable
 	public synchronized Collection<?> readAll (String type)
 	{
 		Collection<?> result = null;
-        
+
 		switch (type)
 		{
 			case "item":
 				result = readAllItems();
 				break;
-				
+
 			case "price":
 				result = readAllPrices();
 				break;
-				
+
 			case "brand":
 				result = readAllBrands();
 				break;
-				
+
 			case "image":
 				result = readAllImages();
 				break;
-                
+
             case "user":
 				result = readAllUsers();
 				break;
-				
+
 			default:
 				break;
 		}
-		
+
 		return result;
 	}
-	
-	private synchronized Collection<Prices> readAllPrices() 
+
+	private synchronized Collection<Prices> readAllPrices()
 	{
 		Collection<Prices> prices = null;
 
@@ -137,7 +173,7 @@ public class InventoryManager implements IInventoryManager, Serializable
 	private synchronized Collection<Manufacturer> readAllBrands()
 	{
         Collection<Manufacturer> brands = null;
-        
+
         brands = brandSvc.readBrands();
 		return brands;
 	}
@@ -149,17 +185,17 @@ public class InventoryManager implements IInventoryManager, Serializable
         images = imageSvc.readImages();
 		return images;
 	}
-    
+
     private synchronized Collection<Users> readAllUsers()
 	{
-        Collection<Users> brands = null;
+        Collection<Users> users = null;
 
-        brands = userSvc.readUsers();
-		return brands;
+        users = userSvc.readUsers();
+		return users;
 	}
 
-	private synchronized Collection<Items> readAllItems() 
-	{	
+	private synchronized Collection<Items> readAllItems()
+	{
         Collection<Items> items = null;
 
         items = itemSvc.readItems();
@@ -180,26 +216,26 @@ public class InventoryManager implements IInventoryManager, Serializable
 		{
 			case "item":
 				break;
-				
+
 			case "price":
 				break;
-				
+
 			case "brand":
 				break;
-				
+
 			case "image":
 				break;
-                
+
             case "user":
                 break;
-				
+
 			default:
 				break;
 		}
-		
+
 		return null;
 	}
-	
+
     /**
      *
      * @param type
@@ -212,30 +248,30 @@ public class InventoryManager implements IInventoryManager, Serializable
 		{
 			case "item":
 				break;
-				
+
 			case "price":
 				break;
-				
+
 			case "brand":
 				break;
-				
+
 			case "image":
 				break;
-                
+
             case "user":
                 break;
-				
+
 			default:
 				break;
 		}
-		
+
 		return null;
 	}
-    
+
     /**
      * Deletes the DAO containing the objects given by <b>type</b>. Removes the
      * physical representation of the object records.
-     * 
+     *
      * @param type The DAO type to delete
      * @return true if DAO deleted, false if not
      */
@@ -243,44 +279,44 @@ public class InventoryManager implements IInventoryManager, Serializable
     public synchronized boolean deleteAll (String type)
     {
         boolean result = false;
-        
+
         switch (type)
 		{
 			case "item":
 				result = deleteItems ("items.db");
 				break;
-				
+
 			case "price":
 				result = deletePrices ("prices.db");
 				break;
-				
+
 			case "brand":
 				result = deleteBrands ("brand.db");
 				break;
-				
+
 			case "image":
 				result = deleteImages ("images.db");
 				break;
-                
+
             case "user":
 				result = deleteUsers ("users.db");
 				break;
-				
+
 			default:
 				break;
 		}
-        
+
         return result;
     }
-    
+
     private synchronized boolean deleteImages (String type)
     {
         boolean result = false;
-   
+
         result = imageSvc.delete (type);
 		return result;
     }
-    
+
     private synchronized boolean deleteUsers (String type)
     {
         boolean result = false;
@@ -288,7 +324,7 @@ public class InventoryManager implements IInventoryManager, Serializable
         result = imageSvc.delete (type);
 		return result;
     }
-    
+
     private synchronized boolean deleteItems (String type)
     {
         boolean result = false;
@@ -296,7 +332,7 @@ public class InventoryManager implements IInventoryManager, Serializable
         result = itemSvc.delete (type);
 		return result;
     }
-    
+
     private synchronized boolean deletePrices (String type)
     {
         boolean result = false;
@@ -304,16 +340,16 @@ public class InventoryManager implements IInventoryManager, Serializable
         result = userSvc.delete (type);
 		return result;
     }
-    
+
     private synchronized boolean deleteBrands (String type)
     {
         boolean result = false;
-        
+
         result = brandSvc.delete (type);
 		return result;
     }
-	
-	
+
+
 	//Items methods
 
     /**
@@ -327,7 +363,7 @@ public class InventoryManager implements IInventoryManager, Serializable
 	{
         boolean result = false;
 
-            
+
         switch (command)
         {
             case "create":
@@ -343,10 +379,10 @@ public class InventoryManager implements IInventoryManager, Serializable
             default:
                 break;
         }
-        
+
         return result;
 	}
-	
+
     /**
      *
      * @param item
@@ -358,8 +394,8 @@ public class InventoryManager implements IInventoryManager, Serializable
         item = itemSvc.readItem (item.getIdItems());
 		return item;
 	}
-	
-	
+
+
 	//Brands methods
 
     /**
@@ -388,10 +424,10 @@ public class InventoryManager implements IInventoryManager, Serializable
             default:
                 break;
         }
-		
+
 		return result;
 	}
-	
+
     /**
      *
      * @param brand
@@ -403,8 +439,8 @@ public class InventoryManager implements IInventoryManager, Serializable
         brand = brandSvc.readBrand (brand.getIdBrand());
 		return brand;
 	}
-	
-	
+
+
 	//Prices methods
 
     /**
@@ -434,10 +470,10 @@ public class InventoryManager implements IInventoryManager, Serializable
             default:
                 break;
         }
-        
+
 		return result;
 	}
-	
+
     /**
      *
      * @param price
@@ -449,8 +485,8 @@ public class InventoryManager implements IInventoryManager, Serializable
         price = priceSvc.readPrice (price.getIdPrices());
 		return price;
 	}
-	
-	
+
+
 	// Images methods
 
     /**
@@ -482,7 +518,7 @@ public class InventoryManager implements IInventoryManager, Serializable
 
 		return result;
 	}
-	
+
     /**
      *
      * @param image
@@ -494,7 +530,7 @@ public class InventoryManager implements IInventoryManager, Serializable
         image = imageSvc.readImage (image.getIdImages());
 		return image;
 	}
-    
+
    // Users methods
 
     /**
@@ -526,7 +562,7 @@ public class InventoryManager implements IInventoryManager, Serializable
 
 		return result;
 	}
-	
+
     /**
      *
      * @param user
@@ -536,10 +572,10 @@ public class InventoryManager implements IInventoryManager, Serializable
     public synchronized Users read (Users user)
 	{
         user = userSvc.readUser (user.getIdUsers());
-        
+
 		return user;
 	}
-    
+
     public boolean validate()
     {
         return true;

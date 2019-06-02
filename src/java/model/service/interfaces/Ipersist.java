@@ -4,43 +4,34 @@
  */
 package model.service.interfaces;
 
+import java.util.Collection;
 import model.service.dao.HashedObjectWrapper;
 import model.domain.interfaces.IDomainObject;
-import org.hibernate.Session;
 
 /**
  * Persistence interface
- * 
+ *
  * @author Paul G. Allen <pgallen@gmail.com>
  */
 public interface Ipersist extends IService
 {
     /**
      *
-     * @param object
-     * @return
-     */
-    boolean addObjectToHashtable (IDomainObject object);
-	
-    /**
-     *
-     * @return
-     */
-    HashedObjectWrapper getHashtable();
-	
-    /**
-     *
      * @param hashtable
      * @return
      */
-    boolean persist (HashedObjectWrapper hashtable);
-	
+    boolean persist (Collection<?> object);
+
     /**
      *
      * @param object
      * @return
      */
-    public IDomainObject find (IDomainObject object);
-    
+    public Collection<?> find (IDomainObject object);
+
     public boolean delete (String type);
+
+    boolean save (Collection<?> object);
+
+    boolean merge (Collection<?> object);
 }

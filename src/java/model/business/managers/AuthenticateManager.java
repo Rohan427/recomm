@@ -197,8 +197,7 @@ public class AuthenticateManager implements IAuthenticate
         resultPage = "/loginResult.xhtml";
         RLSecurity secureModule = new RLSecurity ("bcrypt");
 
-        // TODO: Change to a find
-        Collection<Users> users = (Collection<Users>)manager.readAll ("user");
+        Collection<Users> users = (Collection<Users>)manager.find ("user", userInfo);
         Iterator userItr = users.iterator();
 
         // TODO: Need to update security library and remove use of Strings
@@ -219,6 +218,8 @@ public class AuthenticateManager implements IAuthenticate
                    )
                 {
                     userInfo.setValid (true);
+                    password = null;
+                    userInfo.setSecretKey(null);
                 }
                 else
                 {

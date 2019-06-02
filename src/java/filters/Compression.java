@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class Compression implements Filter
 {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     // The filter configuration object we are associated with.  If
     // this value is null, this filter instance is not currently

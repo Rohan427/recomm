@@ -12,20 +12,17 @@ import model.service.dao.HashedObjectWrapper;
 import model.service.interfaces.IPriceAccessSvc;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Set;
 import model.domain.interfaces.IDomainObject;
 import java.util.Iterator;
+import model.business.error.Logger;
 import model.service.dao.HibernateSvc;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Service;
 
 /**
  * Price access service
- * 
+ *
  * @author Paul G. Allen <pgallen@gmail.com>
  */
 @Service
@@ -33,7 +30,6 @@ public class PriceAccessSvcImpl extends HibernateSvc implements IPriceAccessSvc,
 {
     private static final long serialVersionUID = 45L;
 	private HashedObjectWrapper hashtable;
-    private final static Logger log = LogManager.getLogger (PriceAccessSvcImpl.class.getName());
 
     /**
      *
@@ -46,26 +42,26 @@ public class PriceAccessSvcImpl extends HibernateSvc implements IPriceAccessSvc,
         Transaction transaction;
         Query query;
         Iterator<Prices> iterator;
-        
+
         if (session == null)
         {
             loadService();
         }
-                
-        transaction = session.beginTransaction();        
+
+        transaction = session.beginTransaction();
         query = session.createQuery ("from Prices");
         iterator = (Iterator<Prices>)query.iterate();
-        
+
         while (iterator.hasNext())
         {
             prices.add (iterator.next());
         }
-        
+
         transaction.commit();
-        
+
         return prices;
     }
-    
+
     /**
      *
      * @param price
@@ -73,71 +69,86 @@ public class PriceAccessSvcImpl extends HibernateSvc implements IPriceAccessSvc,
      * @return
      */
     @Override
-	public boolean updatePrice (Prices price, boolean isUpdate) 
+	public boolean updatePrice (Prices price, boolean isUpdate)
 	{
 		boolean result;
-		
-		if (isUpdate)
-		{
-			if (result = addObjectToHashtable (price))
-            {
-                result = merge (hashtable);
-            }
-			result = true;
-		}
-        else if (result = addObjectToHashtable (price))
+        Collection<Prices> prices = new ArrayList<Prices>();
+
+        if (isUpdate)
         {
-            result = save (hashtable);
+            // TODO: complete update code later
+            result = true;
         }
-		
-		return result;
+        else
+        {
+            prices.add ((Prices)price);
+            result = merge (prices);
+        }
+
+        return result;
 	}
-    
-    public boolean save (HashedObjectWrapper object)
+
+    @Override
+    public boolean save (Collection<?> object)
     {
         boolean result = true;
-        Transaction transaction;
+        Transaction transaction = null;
         Prices newPrice;
         Iterator iterator;
-        Hashtable<Integer, IDomainObject> priceTable;
-        Collection<Prices> prices = new ArrayList<>();
-        
+        Collection<Prices> users;
+
 		if (object != null)//validate
 		{
-			this.hashtable = object;
-            
-            if (session == null)
+            users = (Collection<Prices>) object;
+            initSession();
+
+            if (session != null)
             {
-                loadService();
+                try
+                {
+                    transaction = session.beginTransaction();
+                    iterator = users.iterator();
+
+                    while (iterator.hasNext() && result)
+                    {
+                        newPrice = (Prices)iterator.next();
+                        session.save (newPrice);
+                    }
+
+                    transaction.commit();
+                }
+                catch (Exception e)
+                {
+                    result = false;
+
+                    if (transaction != null)
+                    {
+                        try
+                        {
+                            Logger.log (UserAccessSvcImpl.class, e);
+                            transaction.rollback();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.log (PriceAccessSvcImpl.class, "Rollback() failed");
+                        }
+                    }
+                }
             }
-        
-            transaction = session.beginTransaction();
-            
-            priceTable = hashtable.getHashtable();
-            Set<Integer> keys = priceTable.keySet();
-            
-            keys.forEach ((key) ->
+            else
             {
-                Prices price = (Prices)priceTable.get (key);                                
-                prices.add (price);
-            });
-			
-            iterator = prices.iterator();
-            
-            while (iterator.hasNext() && result)
-            {
-                newPrice = (Prices)iterator.next();
-                session.save (newPrice);
+                Logger.log (PriceAccessSvcImpl.class, "PriceAccessSvcImpl.save failed with a NULL session.");
+                result = false;
             }
-            
-            transaction.commit();
 		}
-		// else do nothing
-		
+        else
+        {
+            Logger.log (PriceAccessSvcImpl.class, "PriceAccessSvcImpl.persist failed with a NULL object.");
+            result = false;
+        }
+
 		return result;
     }
-    
-    
 
     /**
      *
@@ -161,181 +172,164 @@ public class PriceAccessSvcImpl extends HibernateSvc implements IPriceAccessSvc,
 		// TODO Auto-generated method stub
 		return true;
 	}
-	
+
     /**
      *
      * @param object
      * @return
      */
     @Override
-	public boolean addObjectToHashtable (IDomainObject object)
-	{
-		boolean result = false;
-		
-		//Instantiate a new table if none exists
-		if (hashtable == null)
-		{
-			hashtable = new HashedObjectWrapper();
-		}
-		// else do nothing
-		
-		if (object != null && object instanceof Prices)//validate input
-		{
-			Prices price = (Prices)object;
-			hashtable.getHashtable().put (price.getIdPrices(), price);
-			result = true;
-		}
-		// else do nothing
-		
-		return result;
-	}
-	
-    /**
-     *
-     * @return
-     */
-    @Override
-	public HashedObjectWrapper getHashtable()
-	{
-		return hashtable;
-	}
-	
-    /**
-     *
-     * @param object
-     * @return
-     */
-    @Override
-	public boolean persist (HashedObjectWrapper object)
+	public boolean persist (Collection<?> object)
 	{
 		boolean result = true;
-        Transaction transaction;
+        Transaction transaction = null;
         Prices newPrice;
         Iterator iterator;
-        Hashtable<Integer, IDomainObject> priceTable;
-        Collection<Prices> prices = new ArrayList<>();
-        
+        Collection<Prices> prices;
+
 		if (object != null)//validate
 		{
-			this.hashtable = object;
-            
-            if (session == null)
+            prices = (Collection<Prices>) object;
+            initSession();
+
+            if (session != null)
             {
-                loadService();
+                try
+                {
+                    transaction = session.beginTransaction();
+                    iterator = prices.iterator();
+
+                    while (iterator.hasNext() && result)
+                    {
+                        newPrice = (Prices)iterator.next();
+                        session.persist (newPrice);
+                    }
+
+                    transaction.commit();
+                }
+                catch (Exception e)
+                {
+                    result = false;
+
+                    if (transaction != null)
+                    {
+                        try
+                        {
+                            Logger.log (UserAccessSvcImpl.class, e);
+                            transaction.rollback();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.log (PriceAccessSvcImpl.class, "Rollback() failed");
+                        }
+                    }
+                }
             }
-        
-            transaction = session.beginTransaction();
-            
-            priceTable = hashtable.getHashtable();
-            Set<Integer> keys = priceTable.keySet();
-            
-            keys.forEach ((key) ->
+            else
             {
-                Prices price = (Prices)priceTable.get (key);                                
-                prices.add (price);
-            });
-			
-            iterator = prices.iterator();
-            
-            while (iterator.hasNext() && result)
-            {
-                newPrice = (Prices)iterator.next();
-                session.persist (newPrice);
+                Logger.log (PriceAccessSvcImpl.class, "PriceAccessSvcImpl.persist failed with a NULL session.");
             }
-            
-            transaction.commit();
 		}
-		// else do nothing
-		
+        else
+        {
+            Logger.log (PriceAccessSvcImpl.class, "PriceAccessSvcImpl.persist failed with a NULL object.");
+            result = false;
+        }
+
 		return result;
 	}
-	
+
     /**
      *
      * @param object
      * @return
      */
     @Override
-	public IDomainObject find (IDomainObject object)
+	public Collection<Prices> find (IDomainObject object)
 	{
-        Transaction transaction;
         Prices price = (Prices)object;
-        
+        Iterator userItr;
+        Object[] userObject;
+        Collection<Prices> prices = new ArrayList<Prices>();
+
         if (session == null)
         {
             loadService();
         }
-                
-        transaction = session.beginTransaction();
+
         object = (Prices)session.get (Prices.class, price.getIdPrices());
-        transaction.commit();
-		
-		return object;
+
+		return prices;
 	}
-    
+
     @Override
     public boolean delete (String type)
     {
         boolean result = false;
         Transaction transaction;
-        
+
         if (session == null)
         {
             loadService();
         }
-        
+
         transaction = session.beginTransaction();
         session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
         session.createSQLQuery ("TRUNCATE Prices").executeUpdate();
         session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
-        
+
         transaction.commit();
         result = true;
-        
+
         return result;
     }
-    
-    public boolean merge (HashedObjectWrapper object)
+
+    @Override
+    public boolean merge (Collection<?> object)
     {
         boolean result = true;
         Transaction transaction;
         Prices newPrice;
         Iterator iterator;
-        Hashtable<Integer, IDomainObject> priceTable;
-        Collection<Prices> prices = new ArrayList<>();
-        
-		if (object != null)//validate
-		{
-			this.hashtable = object;
-            
-            if (session == null)
+        Collection<Prices> prices;
+
+        if (object != null)//validate
+        {
+            prices = (Collection<Prices>) object;
+            initSession();
+
+            if (session != null)
             {
-                loadService();
+                try
+                {
+                    transaction = session.beginTransaction();
+                    iterator = prices.iterator();
+
+                    while (iterator.hasNext() && result)
+                    {
+                        newPrice = (Prices)iterator.next();
+                        session.merge (newPrice);
+                    }
+
+                    transaction.commit();
+                }
+                catch (Exception e)
+                {
+                    Logger.log (PriceAccessSvcImpl.class, e);
+                }
             }
-        
-            transaction = session.beginTransaction();
-            
-            priceTable = hashtable.getHashtable();
-            Set<Integer> keys = priceTable.keySet();
-            
-            keys.forEach ((key) ->
+            else
             {
-                Prices price = (Prices)priceTable.get (key);                                
-                prices.add (price);
-            });
-			
-            iterator = prices.iterator();
-            
-            while (iterator.hasNext() && result)
-            {
-                newPrice = (Prices)iterator.next();
-                session.merge (newPrice);
+                Logger.log (PriceAccessSvcImpl.class, "PriceAccessSvcImpl.merge failed with a NULL session.");
+                result = false;
             }
-            
-            transaction.commit();
-		}
-		// else do nothing
-		
-		return result;
+        }
+        else
+        {
+            Logger.log (PriceAccessSvcImpl.class, "PriceAccessSvcImpl.merge failed with a NULL object.");
+            result = false;
+        }
+
+        return result;
     }
 }

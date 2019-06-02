@@ -2,7 +2,7 @@ Registration and login is now based upon the database. An empty DB will have no 
 Session will begin with a Guest account.
 
 
-Week 6 Changes:
+.04 Changes:
 
 Added application filters as follows. See the updated web.xml file for filter declarations and mappings.
 
@@ -31,7 +31,7 @@ Added application filters as follows. See the updated web.xml file for filter de
 
 
 
-Week 5 Changes:
+.03 Changes:
 
  - Added Spring 4.01 support integrated with JSF.
 
@@ -64,7 +64,7 @@ Week 5 Changes:
      Also updated corresponding result pages and templates as well as logout.xhtml.
 
 
-Week 4 changes
+.02 changes
 
  - Removed JSP and added JSF.
 
@@ -90,7 +90,7 @@ Week 4 changes
  - Added service factory for loading domain service implementation classes.
 
 
-Week 3 changes
+.01 changes
 
  - Added standard error page created dynamically using an error object and with an error handling servlet.
    Error object is stored in the session for continued use during the session as needed.

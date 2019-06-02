@@ -4,9 +4,9 @@
  */
 package model.service.dao;
 
+import model.business.error.Logger;
 import model.service.interfaces.IDAOService;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -22,65 +22,126 @@ public abstract class HibernateSvc implements IDAOService
 {
     protected static SessionFactory factory = null;
     protected static Session session = null;
-    private final static Logger log = LogManager.getLogger (HibernateSvc.class.getName());
-        
+////    private final static Logger log = LogManager.getLogger (HibernateDccSvc.class.getName());
+
     static
     {
         configure();
     }
-    
+
     @Override
     public void loadService()
     {
         HibernateSvc.configure();
     }
-    
+
     private static void configure()
     {
-        try
+        // Create the SessionFactory from standard (hibernate.cfg.xml)
+        // config file.
+        if (factory == null)
         {
-            // Create the SessionFactory from standard (hibernate.cfg.xml) 
-            // config file.
-            if (factory == null)
+            factory = buildSessionFactory();
+        }
+        // else do nothing
+
+        if (factory != null)
+        {
+            if (session != null)
             {
-                factory = new Configuration().configure().buildSessionFactory();
+                try
+                {
+                    session.close();
+                }
+                catch (HibernateException ex)
+                {
+                    Logger.log (HibernateSvc.class, ex);
+                }
             }
-            
-            if (session == null)
+            // else do nothing
+
+            try
             {
                 session = factory.openSession();
+                session.setHibernateFlushMode (FlushMode.ALWAYS);
             }
+            catch (HibernateException ex)
+            {
+                // Log the exception.
+                Logger.log (HibernateSvc.class, ex, "SEVERE: Initial Session creation failed: ");
+                throw new ExceptionInInitializerError (ex);
+            }
+        }
+        else
+        {
+            //TODO: Handle the null factory condition
+        }
+    }
+
+    private static SessionFactory buildSessionFactory()
+    {
+        SessionFactory lFactory = null;
+
+        try
+        {
+            // Create the SessionFactory from hibernate.cfg.xml
+            lFactory = new Configuration().configure ("hibernate.cfg.xml").buildSessionFactory();
         }
         catch (HibernateException ex)
         {
-            // Log the exception. 
-            log.error ("Initial SessionFactory creation failed." + ex);
-            throw new ExceptionInInitializerError (ex);
+            // Make sure you log the exception, as it might be swallowed
+            Logger.log (HibernateSvc.class, ex, "SEVERE: Initial SessionFactory creation failed: ");
         }
+
+        return lFactory;
     }
-    
+
     @Override
     public SessionFactory getFactory()
     {
         return factory;
     }
-    
+
+    @Override
+    public void initSession()
+    {
+        if (session == null)
+        {
+            loadService();
+        }
+        else
+        {
+            if (!session.isOpen())
+            {
+                loadService();
+            }
+            // else do nothing
+        }
+
+        if (session == null)
+        {
+            Logger.log (HibernateSvc.class, "Failed to open a session.");
+        }
+        // else do nothing
+    }
+
     @Override
     public Session getSession()
     {
         return session;
     }
-    
+
     @Override
     protected void finalize() throws Throwable
     {
         try
         {
+            session.flush();
             session.close();
         }
-        catch (HibernateException e)
+        catch (Exception e)
         {
-            
+
         }
         finally
         {
