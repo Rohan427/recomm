@@ -38,7 +38,6 @@ public class AuthenticateManager implements IAuthenticate
     @Autowired
     private InventoryManager manager;
 
-
     String resultPage;
 
 
@@ -169,7 +168,12 @@ public class AuthenticateManager implements IAuthenticate
         this.cfmPassword = cfmPassword;
     }
 
-    private void setSession()
+    public HttpSession getSession()
+    {
+        return this.session;
+    }
+
+    public void setSession()
     {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         session = (HttpSession) facesContext.getExternalContext().getSession (false);
@@ -201,7 +205,7 @@ public class AuthenticateManager implements IAuthenticate
         Iterator userItr = users.iterator();
 
         // TODO: Need to update security library and remove use of Strings
-        do
+        while (userItr.hasNext() && !userInfo.isValid())
         {
             userInfo = (Users)userItr.next();
 
@@ -232,7 +236,7 @@ public class AuthenticateManager implements IAuthenticate
                 session.setAttribute ("expired", false);
             }
 
-        } while (userItr.hasNext() && !userInfo.isValid());
+        };
 
         session.setAttribute ("userBean", userInfo);
         return resultPage;
@@ -260,12 +264,11 @@ public class AuthenticateManager implements IAuthenticate
         resultPage = "/regResult.xhtml";
         RLSecurity secureModule = new RLSecurity ("bcrypt");
 
-        // TODO: Change to a find
-        Collection<Users> users = (Collection<Users>)manager.readAll ("user");
+        Collection<Users> users = (Collection<Users>)manager.find ("user", userInfo);
         Iterator userItr = users.iterator();
 
         // See if user already in system. If it is, then it's not valid
-        do
+        while (userItr.hasNext() && !userInfo.isValid())
         {
             userInfo = (Users)userItr.next();
 
@@ -277,7 +280,7 @@ public class AuthenticateManager implements IAuthenticate
             {
                 userInfo.setValid (false);
             }
-        } while (userItr.hasNext() && !userInfo.isValid());
+        }
 
 
         // Enter the user

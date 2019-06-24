@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import model.business.error.Logger;
+import model.domain.interfaces.ISearchParms;
 import model.domain.interfaces.IUsers;
 import model.service.dao.HibernateSvc;
 import org.hibernate.Query;
@@ -43,15 +44,15 @@ public class UserAccessSvcImpl extends HibernateSvc implements IUserAccessSvc, S
         boolean result = false;
         Transaction transaction;
 
-////        if (session == null)
+////        if (usersession == null)
 ////        {
 ////            loadService();
 ////        }
 ////
-////        transaction = session.beginTransaction();
-////        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
-////        session.createSQLQuery ("TRUNCATE Users").executeUpdate();
-////        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
+////        transaction = usersession.beginTransaction();
+////        usersession.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
+////        usersession.createSQLQuery ("TRUNCATE Users").executeUpdate();
+////        usersession.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
 ////
 ////        transaction.commit();
 ////        result = true;
@@ -66,19 +67,19 @@ public class UserAccessSvcImpl extends HibernateSvc implements IUserAccessSvc, S
         String query = null;
         NativeQuery result;
         List<Object[]> resultSet;
-        initSession();
+        initUserSession();
         Iterator userItr;
         Object[] userObject;
-        Collection<Users> users= new ArrayList<Users>();
+        Collection<Users> users = new ArrayList<Users>();
 
-        if (session != null)
+        if (usersession != null)
         {
             user = (Users)object;
             query = "SELECT * FROM users WHERE UserName = '"
                   + user.getUserName() + "'";
             try
             {
-                result = session.createSQLQuery (query);
+                result = usersession.createSQLQuery (query);
                 resultSet = (List<Object[]>)result.list();
 
                 if (!resultSet.isEmpty())
@@ -114,17 +115,19 @@ public class UserAccessSvcImpl extends HibernateSvc implements IUserAccessSvc, S
                         date = format.parse (userObject[16].toString());
                         user.setCreation (date);
 
+                        user.setValid(true);
+
                         users.add (user);
                     } while (userItr.hasNext());
                 }
                 else
                 {
-                    users = null;
+                    users = new ArrayList<Users>();
                 }
             }
             catch (Exception e)
             {
-                users = null;
+                users = new ArrayList<Users>();
                 Logger.log (UserAccessSvcImpl.class, e);
             }
         }
@@ -148,19 +151,19 @@ public class UserAccessSvcImpl extends HibernateSvc implements IUserAccessSvc, S
 		if (object != null)//validate
 		{
             users = (Collection<Users>) object;
-            initSession();
+            initUserSession();
 
-            if (session != null)
+            if (usersession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = usersession.beginTransaction();
                     iterator = users.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newUser = (Users)iterator.next();
-                        session.persist (newUser);
+                        usersession.persist (newUser);
                     }
 
                     transaction.commit();
@@ -209,19 +212,19 @@ public class UserAccessSvcImpl extends HibernateSvc implements IUserAccessSvc, S
 		if (object != null)//validate
 		{
             users = (Collection<Users>) object;
-            initSession();
+            initUserSession();
 
-            if (session != null)
+            if (usersession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = usersession.beginTransaction();
                     iterator = users.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newUser = (Users)iterator.next();
-                        session.save (newUser);
+                        usersession.save (newUser);
                     }
 
                     transaction.commit();
@@ -271,13 +274,13 @@ public class UserAccessSvcImpl extends HibernateSvc implements IUserAccessSvc, S
         Collection<Users> users = new ArrayList<Users>();
         org.hibernate.query.Query query;
         Iterator<Users> iterator;
-        initSession();
+        initUserSession();
 
-        if (session != null)
+        if (usersession != null)
         {
             try
             {
-                query = session.createQuery ("from users");
+                query = usersession.createQuery ("from users");
                 iterator = (Iterator<Users>)query.iterate();
 
                 while (iterator.hasNext())
@@ -336,19 +339,19 @@ public class UserAccessSvcImpl extends HibernateSvc implements IUserAccessSvc, S
         if (object != null)//validate
         {
             users = (Collection<Users>) object;
-            initSession();
+            initUserSession();
 
-            if (session != null)
+            if (usersession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = usersession.beginTransaction();
                     iterator = users.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newUser = (Users)iterator.next();
-                        session.merge (newUser);
+                        usersession.merge (newUser);
                     }
 
                     transaction.commit();
@@ -371,5 +374,11 @@ public class UserAccessSvcImpl extends HibernateSvc implements IUserAccessSvc, S
         }
 
         return result;
+    }
+
+    @Override
+    public Collection<?> search(ISearchParms searchParms)
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -6,8 +6,8 @@
 package model.business.interfaces;
 
 import java.util.Collection;
-import model.business.interfaces.IDAOManager;
 import model.domain.interfaces.IDomainObject;
+import model.domain.interfaces.IItems;
 import model.domain.interfaces.IUsers;
 import model.domain.inventory.Images;
 import model.domain.inventory.Items;
@@ -150,4 +150,5 @@ public interface IInventoryManager extends IDAOManager
      */
     boolean update (IUsers user, String command);
 
+    Collection<IItems> findProducts (String cat);
 }

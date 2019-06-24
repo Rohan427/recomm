@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration">
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-configuration">
 <!--
 DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
@@ -43,9 +43,25 @@ Contributor(s):
     <session-factory>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
         <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-        <property name="hibernate.connection.url">jdbc:mysql://[your_hostname]:3306/customer?zeroDateTimeBehavior=convertToNull</property>
-        <property name="hibernate.connection.username">[your_username]</property>
-        <property name="hibernate.connection.password">[your_password]</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/customer?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">root</property>
+
+
+    <!-- session-factory>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property >
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://recommdb.randomlogic.net:3306/customer?zeroDateTimeBehavior=convertToNull</property>
+        <property name="hibernate.connection.username">recomm</property>
+        <property name="hibernate.connection.password">Cu5t0m3rrecomm</property>
+
+
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://randomlogic.net:3306/Customer?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull</property>
+        <property name="hibernate.connection.username">vase</property>
+        <property name="hibernate.connection.password">Cu5t0m3rrecomm</property -->
+
 
         <!-- Enable Hibernate's automatic session context management -->
         <property name="current_session_context_class">thread</property>

@@ -32,22 +32,15 @@ import org.hibernate.annotations.Proxy;
  */
 @Entity
 @Proxy(lazy=false)
-@Table (catalog = "recomm", schema = "", uniqueConstraints =
-        {
-            @UniqueConstraint (columnNames =
-            {
-                "PartNo"
-            })
-            , @UniqueConstraint (columnNames =
-            {
-                "PartName"
-            })
-            , @UniqueConstraint (columnNames =
-            {
-                "idItems"
-            })
-})
-@XmlRootElement
+@Table
+(
+    catalog = "recomm", schema = "", uniqueConstraints =
+    {
+        @UniqueConstraint (columnNames = {"PartNo"}),
+        @UniqueConstraint (columnNames = {"PartName"}),
+        @UniqueConstraint (columnNames = {"idItems"})
+    }
+)
 ////@NamedQueries (
 ////{
 ////    @NamedQuery (name = "Items.findAll", query = "SELECT i FROM Items i")
@@ -201,7 +194,7 @@ public class Items extends IItems implements Serializable
                   Date eta,
                   String hazCode,
                   Date creation
-                 ) 
+                 )
     {
         this.idItems = idItems;
         this.partNo = partNo;
@@ -530,7 +523,7 @@ public class Items extends IItems implements Serializable
     {
         this.image = image;
     }
-    
+
     /**
      *
      * @return
@@ -575,9 +568,9 @@ public class Items extends IItems implements Serializable
         {
             return false;
         }
-        
+
         Items other = (Items)object;
-        
+
         if ((this.idItems == null && other.idItems != null) || (this.idItems != null && ! this.idItems.equals (other.idItems)))
         {
             return false;
@@ -590,5 +583,5 @@ public class Items extends IItems implements Serializable
     {
         return "com.recomm.model.domain.inventory.Items[ idItems=" + idItems + " ]";
     }
-    
+
 }

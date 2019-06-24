@@ -14,10 +14,14 @@ import model.domain.interfaces.IDomainObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import model.business.error.Logger;
+import model.domain.interfaces.ISearchParms;
+import model.domain.inventory.ItemSearchParams;
 import model.service.dao.HibernateSvc;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
+import org.hibernate.query.NativeQuery;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,7 +33,6 @@ import org.springframework.stereotype.Service;
 public class ItemAccessSvcImpl extends HibernateSvc implements IItemAccessSvc, Serializable
 {
     private static final long serialVersionUID = 41L;
-	private HashedObjectWrapper hashtable;
 
     @Override
     public Collection<Items> readItems()
@@ -39,13 +42,13 @@ public class ItemAccessSvcImpl extends HibernateSvc implements IItemAccessSvc, S
         Query query;
         Iterator<Items> iterator;
 
-        if (session == null)
+        if (invsession == null)
         {
-            loadService();
+            loadService ("inv");
         }
 
-        transaction = session.beginTransaction();
-        query = session.createQuery ("from Items");
+        transaction = invsession.beginTransaction();
+        query = invsession.createQuery ("from Items");
         iterator = (Iterator<Items>)query.iterate();
 
         while (iterator.hasNext())
@@ -119,19 +122,19 @@ public class ItemAccessSvcImpl extends HibernateSvc implements IItemAccessSvc, S
 		if (object != null)//validate
 		{
             items = (Collection<Items>) object;
-            initSession();
+            initInvSession();
 
-            if (session != null)
+            if (invsession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = invsession.beginTransaction();
                     iterator = items.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newItem = (Items)iterator.next();
-                        session.save (newItem);
+                        invsession.save (newItem);
                     }
 
                     transaction.commit();
@@ -182,12 +185,12 @@ public class ItemAccessSvcImpl extends HibernateSvc implements IItemAccessSvc, S
         Object[] userObject;
         Collection<Items> items = new ArrayList<Items>();
 
-        if (session == null)
+        if (invsession == null)
         {
-            loadService();
+            loadService ("inv");
         }
 
-        object = (Items)session.get (Items.class, item.getIdItems());
+        object = (Items)invsession.get (Items.class, item.getIdItems());
 
 		return items;
 	}
@@ -198,15 +201,15 @@ public class ItemAccessSvcImpl extends HibernateSvc implements IItemAccessSvc, S
         boolean result = false;
         Transaction transaction;
 
-        if (session == null)
+        if (invsession == null)
         {
-            loadService();
+            loadService ("inv");
         }
 
-        transaction = session.beginTransaction();
-        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
-        session.createSQLQuery ("TRUNCATE Items").executeUpdate();
-        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
+        transaction = invsession.beginTransaction();
+        invsession.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
+        invsession.createSQLQuery ("TRUNCATE Items").executeUpdate();
+        invsession.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
         transaction.commit();
         result = true;
 
@@ -225,19 +228,19 @@ public class ItemAccessSvcImpl extends HibernateSvc implements IItemAccessSvc, S
 		if (object != null)//validate
 		{
             items = (Collection<Items>) object;
-            initSession();
+            initInvSession();
 
-            if (session != null)
+            if (invsession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = invsession.beginTransaction();
                     iterator = items.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newItem = (Items)iterator.next();
-                        session.persist (newItem);
+                        invsession.persist (newItem);
                     }
 
                     transaction.commit();
@@ -286,19 +289,19 @@ public class ItemAccessSvcImpl extends HibernateSvc implements IItemAccessSvc, S
         if (object != null)//validate
         {
             items = (Collection<Items>) object;
-            initSession();
+            initInvSession();
 
-            if (session != null)
+            if (invsession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = invsession.beginTransaction();
                     iterator = items.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newItem = (Items)iterator.next();
-                        session.merge (newItem);
+                        invsession.merge (newItem);
                     }
 
                     transaction.commit();
@@ -321,5 +324,97 @@ public class ItemAccessSvcImpl extends HibernateSvc implements IItemAccessSvc, S
         }
 
         return result;
+    }
+
+    @Override
+    public Collection<?> search (ISearchParms searchParms)
+    {
+        Items item = new Items();
+        Collection<Items> itemList = new ArrayList<Items>();
+        NativeQuery result;
+        List<Object[]> resultSet;
+        ItemSearchParams params = (ItemSearchParams)searchParms;
+
+        initInvSession();
+
+        if (invsession!= null)
+        {
+            item.setDescription (params.getDesc());
+            item.setPartName (params.getName());
+            item.setUpc (params.getUpc());
+            item.setPartNo (params.getPartNo());
+            /**
+             * SELECT *
+             *      FROM [dbo].[logs]
+             *      WHERE customerId LIKE '%289362%'
+             *      AND errorMsg LIKE '%Successful%'
+             *      AND logDate >= '2019-04-23 00:00:00'
+             *      AND logDate <= '2019-04-23 23:59:59.999'
+             */
+            String query = "SELECT * FROM Items" +
+                           " WHERE PartNo LIKE '%" + item.getPartNo() + "%'" +
+                           " AND PartName LIKE '%" + item.getPartName() + "%'" +
+                           " AND UPC LIKE '%" + item.getUpc() + "%'" +
+                           " AND Description LIKE '%" + item.getDescription()  + "%'";
+            try
+            {
+                result = invsession.createSQLQuery (query);
+                resultSet = (List<Object[]>)result.list();
+
+                if (!resultSet.isEmpty())
+                {
+                    for (Object[] element : resultSet)
+                    {
+                        try
+                        {
+                            item.setIdItems (Integer.parseInt (element[0].toString()));
+                        }
+                        catch (Exception e)
+                        {
+
+                        }
+
+                        item.setPartNo (element[1].toString());
+                        item.setPartName (element[2].toString());
+                        item.setDescription (element[3].toString());
+                        item.setUpc (element[4].toString());
+
+                        try
+                        {
+                            item.setQty (Integer.parseInt (element[5].toString()));
+                        }
+                        catch (Exception e)
+                        {
+                            item.setQty (0);
+                        }
+
+                        try
+                        {
+                            item.setInventory (Integer.parseInt (element[6].toString()));
+                        }
+                        catch (Exception e)
+                        {
+                            item.setInventory (0);
+                        }
+
+                        item.setDefaultImage (element[21].toString());
+
+                        itemList.add (item);
+                    }
+                }
+                // else do nothing
+            }
+            catch (Exception e)
+            {
+                itemList = new ArrayList<Items>();
+                Logger.log (LogsAccessSvcImpl.class, e);
+            }
+        }
+        else
+        {
+            Logger.log (ItemAccessSvcImpl.class, "Items.search failed with a NULL session.");
+        }
+
+        return itemList;
     }
 }

@@ -34,12 +34,13 @@ import org.hibernate.annotations.Proxy;
 @Entity
 @Proxy(lazy=false)
 @Table (catalog = "recomm", schema = "", uniqueConstraints =
-        {
-            @UniqueConstraint (columnNames =
             {
-                "idImages"
-            })
-})
+                @UniqueConstraint (columnNames =
+                {
+                    "idImages"
+                })
+            }
+       )
 @XmlRootElement
 @NamedQueries (
 {
@@ -83,11 +84,11 @@ public class Images extends IImages implements Serializable
         this.idImages = idImages;
     }
 
-    public Images (Integer idImages, 
-                   String imagePath, 
-                   Integer usersidUsers, 
+    public Images (Integer idImages,
+                   String imagePath,
+                   Integer usersidUsers,
                    Date creation
-                  ) 
+                  )
     {
         this.idImages = idImages;
         this.imagePath = imagePath;
@@ -154,7 +155,7 @@ public class Images extends IImages implements Serializable
     {
         this.itemsCollection = itemsCollection;
     }
-    
+
     /**
      *
      * @return
@@ -181,14 +182,14 @@ public class Images extends IImages implements Serializable
         {
             return false;
         }
-        
+
         Images other = (Images)object;
-        
+
         if ((this.idImages == null && other.idImages != null) || (this.idImages != null && ! this.idImages.equals (other.idImages)))
         {
             return false;
         }
-        
+
         return true;
     }
 
@@ -197,5 +198,5 @@ public class Images extends IImages implements Serializable
     {
         return imagePath;
     }
-    
+
 }

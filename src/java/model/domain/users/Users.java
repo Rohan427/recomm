@@ -63,19 +63,19 @@ public class Users extends IUsers implements Serializable
     private String secretKey;
 
 
-    private Integer a = null;
-    private Integer a1 = null;
-    private String a2 = null;
+    private Integer a = 0;
+    private Integer a1 = 0;
+    private String a2 = "";
 
-    private Integer b = null;
-    private Integer b1 = null;
-    private String b2 = null;
+    private Integer b = 0;
+    private Integer b1 = 0;
+    private String b2 = "";
 
-    private Integer c = null;
-    private Integer c1 = null;
-    private String c2 = null;
+    private Integer c = 0;
+    private Integer c1 = 0;
+    private String c2 = "";
 
-    private Integer d = null;
+    private Integer d = 0;
 
     @Basic(optional = false)
     @Temporal(TemporalType.TIMESTAMP)

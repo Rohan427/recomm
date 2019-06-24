@@ -3,13 +3,28 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/src/recomm/src/java/model/service/impl/UserAccessSvcImpl.java</file>
-            <file>file:/E:/src/recomm/src/java/hibernate.cfg.xml</file>
-            <file>file:/E:/src/recomm/src/java/filters/Tracking.java</file>
             <file>file:/E:/src/recomm/src/java/model/business/managers/InventoryManager.java</file>
-            <file>file:/E:/src/recomm/src/java/model/domain/users/Users.hbm.xml</file>
-            <file>file:/E:/src/recomm/src/java/filters/Compression.java</file>
-            <file>file:/E:/src/recomm/src/java/model/domain/users/Users.java</file>
+            <file>file:/E:/src/recomm/src/java/recomm.hibernate.cfg.xml</file>
+            <file>file:/E:/src/recomm/src/java/model/domain/inventory/Items.java</file>
+            <file>file:/E:/src/recomm/src/java/model/business/interfaces/IInventoryManager.java</file>
+            <file>file:/E:/src/recomm/src/java/model/domain/inventory/ItemSearchParams.java</file>
+            <file>file:/E:/src/recomm/web/WEB-INF/web.xml</file>
+            <file>file:/E:/src/recomm/src/java/hibernate.cfg.xml</file>
+            <file>file:/E:/src/recomm/src/java/model/service/impl/ImageAccessSvcImpl.java</file>
+            <file>file:/E:/src/recomm/src/java/model/service/impl/BrandAccessSvcImpl.java</file>
+            <file>file:/E:/src/recomm/web/view/inventory/catalog_content.xhtml</file>
+            <file>file:/E:/src/recomm/src/java/model/service/dao/HibernateSvc.java</file>
+            <file>file:/E:/src/recomm/src/java/model/business/managers/beans/InventoryBean.java</file>
+            <file>file:/E:/src/recomm/test/model/service/impl/ItemAccessSvcImplTest.java</file>
+            <file>file:/E:/src/recomm/web/WEB-INF/faces-config.xml</file>
+            <file>file:/E:/src/recomm/test/model/service/impl/PriceAccessSvcImplTest.java</file>
+            <file>file:/E:/src/recomm/web/WEB-INF/dispatcher-servlet.xml</file>
+            <file>file:/E:/src/recomm/src/java/model/service/impl/UserAccessSvcImpl.java</file>
+            <file>file:/E:/src/recomm/src/java/model/service/interfaces/Ipersist.java</file>
+            <file>file:/E:/src/recomm/web/WEB-INF/applicationContext.xml</file>
+            <file>file:/E:/src/recomm/src/java/model/domain/inventory/Manufacturer.java</file>
+            <file>file:/E:/src/recomm/src/java/model/domain/inventory/Prices.java</file>
+            <file>file:/E:/src/recomm/src/java/model/service/impl/ItemAccessSvcImpl.java</file>
         </group>
     </open-files>
 </project-private>

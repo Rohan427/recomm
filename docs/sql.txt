@@ -1,0 +1,191 @@
+Unable to connect. Cannot establish a connection to jdbc:mysql://randomlogic.net:3306/rlapi?zeroDateTimeBehavior=convertToNull using com.mysql.jdbc.Driver (null,  message from server: "Host '63-231-99-70.dia.static.qwest.net' is not allowed to connect to this MariaDB server").
+
+
+
+P@ym3ntpr0c3550r
+
+
+CREATE TABLE IF NOT EXISTS `rlapi`.`Manufacturer` (
+  `idManufacturer` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `MfgKey` VARCHAR(45) NOT NULL,
+  `ManName` VARCHAR(45) NOT NULL,
+  `Address1` VARCHAR(45) NULL,
+  `Address2` VARCHAR(45) NULL,
+  `City` VARCHAR(45) NULL,
+  `State` VARCHAR(45) NULL,
+  `Country` VARCHAR(45) NULL,
+  `Zip` VARCHAR(45) NULL,
+  `Phone` VARCHAR(45) NULL,
+  `Users_idUsers` INT NOT NULL,
+  `Creation` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idManufacturer`),
+  UNIQUE INDEX `idManufacturer_UNIQUE` (`idManufacturer` ASC) VISIBLE,
+  UNIQUE INDEX `MfgKey_UNIQUE` (`MfgKey` ASC) VISIBLE,
+  INDEX `fk_Manufacturer_Users1_idx` (`Users_idUsers` ASC) VISIBLE,
+  CONSTRAINT `fk_Manufacturer_Users1`
+    FOREIGN KEY (`Users_idUsers`)
+    REFERENCES `Customer`.`Users` (`idUsers`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+
+
+CREATE TABLE IF NOT EXISTS `rlapi`.`Items` (
+  `idItems` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `PartNo` VARCHAR(45) NOT NULL,
+  `PartName` VARCHAR(100) NOT NULL,
+  `Description` LONGTEXT NULL,
+  `UPC` VARCHAR(45) NULL,
+  `Qty` INT UNSIGNED NOT NULL DEFAULT 0,
+  `Inventory` INT UNSIGNED NOT NULL DEFAULT 0,
+  `Retail` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
+  `MAP` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
+  `Net` DECIMAL(9,2) NOT NULL DEFAULT 0.00,
+  `PL` VARCHAR(10) NOT NULL DEFAULT '',
+  `Discount` INT NOT NULL DEFAULT 0,
+  `HazCode` VARCHAR(45) NULL,
+  `Mult` INT NOT NULL,
+  `QD` VARCHAR(45) NULL,
+  `ETA` DATETIME NULL,
+  `ShipCode` VARCHAR(45) NULL,
+  `Stat` VARCHAR(45) NULL,
+  `Rank` VARCHAR(45) NULL,
+  `Dist` VARCHAR(45) NOT NULL DEFAULT 'H',
+  `Manufacturer_idManufacturer` INT UNSIGNED NULL,
+  `DefaultImage` VARCHAR(100) NOT NULL DEFAULT '/images/ProdInfo/img_not_available.gif',
+  `ImageOrder` VARCHAR(45) NULL,
+  `Users_idUsers` INT NOT NULL,
+  `Creation` DATETIME NOT NULL,
+  PRIMARY KEY (`idItems`),
+  UNIQUE INDEX `idItems_UNIQUE` (`idItems` ASC) VISIBLE,
+  UNIQUE INDEX `Name_UNIQUE` (`PartName` ASC) VISIBLE,
+  UNIQUE INDEX `PartNo_UNIQUE` (`PartNo` ASC) VISIBLE,
+  INDEX `fk_Items_Manufacturer_idx` (`Manufacturer_idManufacturer` ASC) VISIBLE,
+  INDEX `fk_Items_Users1_idx` (`Users_idUsers` ASC) VISIBLE,
+  CONSTRAINT `fk_Items_Manufacturer`
+    FOREIGN KEY (`Manufacturer_idManufacturer`)
+    REFERENCES `rlapi`.`Manufacturer` (`idManufacturer`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Items_Users1`
+    FOREIGN KEY (`Users_idUsers`)
+    REFERENCES `Customer`.`Users` (`idUsers`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+
+
+CREATE TABLE IF NOT EXISTS `rlapi`.`Items_has_Category` (
+  `Items_idItems` INT UNSIGNED NOT NULL,
+  `Category_idCategory` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`Items_idItems`, `Category_idCategory`),
+  INDEX `fk_Items_has_Category_Category1_idx` (`Category_idCategory` ASC) VISIBLE,
+  INDEX `fk_Items_has_Category_Items1_idx` (`Items_idItems` ASC) VISIBLE,
+  CONSTRAINT `fk_Items_has_Category_Items1`
+    FOREIGN KEY (`Items_idItems`)
+    REFERENCES `rlapi`.`Items` (`idItems`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Items_has_Category_Category1`
+    FOREIGN KEY (`Category_idCategory`)
+    REFERENCES `rlapi`.`Category` (`idCategory`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+
+
+CREATE TABLE IF NOT EXISTS `rlapi`.`Category` (
+  `idCategory` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `CatKey` VARCHAR(5) NOT NULL,
+  `CatName` VARCHAR(255) NOT NULL,
+  `Description` VARCHAR(1000) NULL,
+  `Creation` DATETIME NOT NULL,
+  PRIMARY KEY (`idCategory`),
+  UNIQUE INDEX `Name_UNIQUE` (`CatName` ASC) VISIBLE,
+  UNIQUE INDEX `idCategory_UNIQUE` (`idCategory` ASC) VISIBLE,
+  UNIQUE INDEX `Key_UNIQUE` (`CatKey` ASC) VISIBLE)
+ENGINE = InnoDB
+COMMENT = 'List of item categoies used for search filters.'
+
+
+CREATE TABLE IF NOT EXISTS `rlapi`.`Items_has_Images` (
+  `Items_idItems` INT UNSIGNED NOT NULL,
+  `Images_idImages` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`Items_idItems`, `Images_idImages`),
+  INDEX `fk_Items_has_Images_Images1_idx` (`Images_idImages` ASC) VISIBLE,
+  INDEX `fk_Items_has_Images_Items1_idx` (`Items_idItems` ASC) VISIBLE,
+  CONSTRAINT `fk_Items_has_Images_Items1`
+    FOREIGN KEY (`Items_idItems`)
+    REFERENCES `rlapi`.`Items` (`idItems`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Items_has_Images_Images1`
+    FOREIGN KEY (`Images_idImages`)
+    REFERENCES `rlapi`.`Images` (`idImages`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+
+
+CREATE TABLE IF NOT EXISTS `rlapi`.`Images` (
+  `idImages` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ImagePath` VARCHAR(255) NOT NULL,
+  `Users_idUsers` INT NOT NULL,
+  `Creation` DATETIME NOT NULL,
+  PRIMARY KEY (`idImages`),
+  UNIQUE INDEX `idImages_UNIQUE` (`idImages` ASC) VISIBLE,
+  INDEX `fk_Images_Users1_idx` (`Users_idUsers` ASC) VISIBLE,
+  CONSTRAINT `fk_Images_Users1`
+    FOREIGN KEY (`Users_idUsers`)
+    REFERENCES `Customer`.`Users` (`idUsers`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+
+
+
+
+
+CREATE TABLE IF NOT EXISTS `rlapi`.`Cart` (
+  `idCart` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Customer_idCustomer` INT UNSIGNED NOT NULL,
+  `Items_idItems` INT UNSIGNED NOT NULL,
+  `Qty` INT NOT NULL,
+  `Creation` DATETIME NOT NULL,
+  PRIMARY KEY (`idCart`, `Customer_idCustomer`),
+  UNIQUE INDEX `idCart_UNIQUE` (`idCart` ASC) VISIBLE,
+  INDEX `fk_Cart_Items1_idx` (`Items_idItems` ASC) VISIBLE,
+  INDEX `fk_Cart_Customer1_idx` (`Customer_idCustomer` ASC) VISIBLE,
+  CONSTRAINT `fk_Cart_Items1`
+    FOREIGN KEY (`Items_idItems`)
+    REFERENCES `rlapi`.`Items` (`idItems`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Cart_Customer1`
+    FOREIGN KEY (`Customer_idCustomer`)
+    REFERENCES `Customer`.`Customer` (`idCustomer`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+
+
+CREATE TABLE IF NOT EXISTS `rlapi`.`Wishlist` (
+  `idWishlist` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Customer_idCustomer` INT UNSIGNED NOT NULL,
+  `Items_idItems` INT UNSIGNED NOT NULL,
+  `Creation` DATETIME NOT NULL,
+  PRIMARY KEY (`idWishlist`, `Customer_idCustomer`),
+  UNIQUE INDEX `idWishlist_UNIQUE` (`idWishlist` ASC) VISIBLE,
+  INDEX `fk_Wishlist_Items1_idx` (`Items_idItems` ASC) VISIBLE,
+  INDEX `fk_Wishlist_Customer1_idx` (`Customer_idCustomer` ASC) VISIBLE,
+  CONSTRAINT `fk_Wishlist_Items1`
+    FOREIGN KEY (`Items_idItems`)
+    REFERENCES `rlapi`.`Items` (`idItems`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Wishlist_Customer1`
+    FOREIGN KEY (`Customer_idCustomer`)
+    REFERENCES `Customer`.`Customer` (`idCustomer`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB

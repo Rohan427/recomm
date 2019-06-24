@@ -121,9 +121,9 @@ public class PriceAccessSvcImplTest
 
 		assertTrue (priceSvc.find (price) instanceof IDomainObject
 				    && priceSvc.find (price) instanceof Prices,
-				    "brandSvc.testFind is VALID FAILED"
+				    "priceSvc.testFind is VALID FAILED"
 				    );
 
-		System.out.println ("\tbrandSvc.testFind is VALID PASSED");
+		System.out.println ("\tpriceSvc.testFind is VALID PASSED");
 	}
 }

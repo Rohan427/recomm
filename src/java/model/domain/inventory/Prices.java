@@ -145,14 +145,14 @@ public class Prices extends IPrices implements Serializable
         {
             return false;
         }
-        
+
         Prices other = (Prices)object;
-        
+
         if ((this.idPrices == null && other.idPrices != null) || (this.idPrices != null && ! this.idPrices.equals (other.idPrices)))
         {
             return false;
         }
-        
+
         return true;
     }
 

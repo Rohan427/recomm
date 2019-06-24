@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 public class LoginBean implements Serializable
 {
     private static final long serialVersionUID = 3614312547399778619L;
+
     @Autowired
     private IAuthenticate authenticate;
 
@@ -132,7 +133,7 @@ public class LoginBean implements Serializable
         return authenticate.getUserInfo();
     }
 
-    public void setUderInfo (IUsers userInfo)
+    public void setUserInfo (IUsers userInfo)
     {
         authenticate.setUserInfo (userInfo);
     }

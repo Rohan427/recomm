@@ -3,10 +3,8 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui"
 >
     <ui:composition>
-        <ui:fragment rendered="#{userBean.valid}" >
         <div class="div_header">
             <h1>Inventory</h1>
         </div>
@@ -15,47 +13,235 @@
             <a href="search.xhtml">Search Items</a><br />
             <a href="inventory.xhtml">Inventory Manager</a><br />
         </div>
-        
+
         <div class="res_div_header">
-                Inventory
+                Catalog
         </div>
 
         <div class="res_div_main">
+            <h3>Search Criteria</h3>
+            <div style="width: 500px">
+                <h:form>
+                    <p class="form1">
+                        Part Number:<input class="frightc"
+                                          type="text"
+                                          name="partNo"
+                                          title="Part Number"
+                                          size="45"
+                                          value="#{inventoryBean.partNo}"
+                                   />
+                    </p>
+                    <p class="form2">
+                        Description:<input class="frightc"
+                                           type="text"
+                                           name="desc"
+                                           title="Description"
+                                           size="45"
+                                           value="#{inventoryBean.desc}"
+                                    />
+                    </p>
+                    <p class="form1">
+                        UPC:<input class="frightc"
+                                   type="text"
+                                   name="upc"
+                                   title="UPC"
+                                   size="45"
+                                   value="#{inventoryBean.upc}"
+                            />
+                    </p>
+                    <p class="form2">
+                        Items per Page:<input class="frightc"
+                                              type="text"
+                                              name="pageLimit"
+                                              title="Items per page"
+                                              size="45"
+                                              value="#{inventoryBean.pageLimit}"
+                                       />
+                    </p>
+                    <p>
+                        <h:commandButton value = "Submit"
+                                         type = "submit"
+                                         action = "#{inventoryBean.findProduct()}"
+                        >
+                            <f:param name="pageTitle" value="Catalog" />
+                            <f:param name="sourcePage" value="catalog.xhtml" />
+                        </h:commandButton>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <h:commandButton type="reset" value="Reset" label="Reset" />
+                    </p>
+                </h:form>
+            </div>
+            <div>
+                <table class="fileSearch" cellpadding="0" cellspacing="0">
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="results">
+                                <h2>#{inventoryBean.pageTitle}</h2>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="Search" cellpadding="0" cellspacing="0">
+                    <tbody>
+                        <tr class="heading">
+                            <td></td>
+                            <td>
+                                <h3>
+                                    <h:link outcome = "#{inventoryBean.sourcePage}" >
+                                        <h:outputText  value = "Part Number" />
+                                        <f:param name="pageTitle" value="#{inventoryBean.pageTitle}" />
+                                        <f:param name="orderBy" value="partNo" />
+                                    </h:link>
+                                </h3>
+                            </td>
+                            <td>
+                                <h3>
+                                    <h:link outcome = "#{inventoryBean.sourcePage}" >
+                                        <h:outputText value = "Part Name" />
+                                        <f:param name="pageTitle" value="#{inventoryBean.pageTitle}" />
+                                        <f:param name="orderBy" value="partName" />
+                                    </h:link>
+                                </h3>
+                            </td>
+                            <td>
+                                <h3>
+                                    <h:link outcome = "#{inventoryBean.sourcePage}" >
+                                        <h:outputText value="Description" />
+                                        <f:param name="pageTitle" value="#{inventoryBean.pageTitle}" />
+                                        <f:param name="orderBy" value="desc" />
+                                    </h:link>
+                                </h3>
+                            </td>
+                            <td>
+                                <h3>Qty Available</h3>
+                            </td>
+                            <td>
+                                <h3>
+                                    <h:link outcome = "#{inventoryBean.sourcePage}" >
+                                        <h:outputText value = "Manufacturer" />
+                                        <f:param name="pageTitle" value="#{inventoryBean.pageTitle}" />
+                                        <f:param name="orderBy" value="partMfg" />
+                                    </h:link>
+                                </h3>
+                            </td>
+                            <td>
+                                <h3>
+                                    <h:link outcome = "#{inventoryBean.sourcePage}" value = "UPC" >
+                                        <f:param name="pageTitle" value="#{inventoryBean.pageTitle}" />
+                                        <f:param name="orderBy" value="partUPC" />
+                                    </h:link>
+                                </h3>
+                            </td>
+                            <td>
+                                <h3>Price</h3>
+                            </td>
+                        </tr>
 
-            <pre>
-                Welcome to the ReComm Inventory Manager.
+                        <ui:repeat value="#{inventoryBean.itemList}" var="itemSet" >
+                        <tr class="data1">
 
-                Here you can view the catalog.
-            </pre>
-        
-        </div>
+                            <ui:fragment rendered="#{!empty itemSet.image}" >
+                            <td>
+                                <div id="links" align="center">
+                                    <div class="thumbnail"
+                                         style="background-image: url('../../images/ProdInfo/img_not_available.gif');
+                                                background-repeat:no-repeat;
+                                                background-size: 100px 100px;
+                                                height: 100px;
+                                                width: 100px;"
+                                    >
+                                        <h:link outcome = "../../images/ProdInfo/#{itemSet.brand.brandKey}/450/#{itemSet.partNo}-450.jpg" target="_blank" >
+                                            <h:graphicImage value="../../images/ProdInfo/#{itemSet.brand.brandKey}/450/#{itemSet.partNo}-450.jpg" />
+                                        </h:link>
+                                    </div>
+                                </div>
+                            </td>
+                            </ui:fragment>
 
-        <div id="main">
+                            <ui:fragment>
+                            <td>
+                                <img src="../..#{itemSet.defaultImage}" height="100" width="100" /><br/>
+                                <h:form>
+                                    <h:commandButton action="../products/getImage.jsp"
+                                                     type="submit"
+                                                     value="View Image"
+                                                     label="Submit"
+                                    >
+                                        <f:param name="image" value="#{itemSet.brand.brandKey}" />
+                                    </h:commandButton>
+                                </h:form>
+                            </td>
+                                </ui:fragment>
+
+                            <td>
+                                #{itemSet.partNo}
+                            </td>
+                            <td>
+                                #{itemSet.partName}
+                            </td>
+                            <td>
+                                #{itemSet.description}
+                            </td>
+                            <td>
+                                #{itemSet.qty}
+                            </td>
+                            <td>
+                                #{itemSet.brand.brandKey}
+                            </td>
+                            <td>
+                                #{itemSet.upc}
+                            </td>
+                            <td>
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                #{itemSet.retail}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div id="links" align="center">
+                                                    <h:form target="_blank">
+                                                        <f:param name="pageTitle" value="Cart" />
+                                                        <f:param name="itemId" value="#{itemSet.idItems}" />
+                                                            <div class="thumbnail" >
+                                                                <h:commandButton action="#{cartBean.cartAdd()}"
+                                                                                 type="submit"
+                                                                                 image="../../images/green-cart-button-hi.png"
+                                                                                 style="background-repeat: no-repeat;
+                                                                                        background-size: 60px 60px;
+                                                                                        width: 60px;
+                                                                                        height: 60px;"
+                                                                />
+                                                            </div>
+                                                    </h:form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <h:form target="_blank">
+                                                    <f:param name="pageTitle" value="Wish List" />
+                                                    <f:param name="itemId" value="#{itemSet.idItems}" />
+                                                    <h:commandButton action="#{cartBean.wishlistAdd()}"
+                                                                     value="+ Wish List"
+                                                                     type="submit"
+                                                    />
+                                                </h:form>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        </ui:repeat>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <p>
             <small>&nbsp;</small>
         </p>
-        </ui:fragment>
-        
-        <ui:fragment rendered="#{not userBean.valid}">
-            <div id="header">
-
-        <pre>
-            Welcome to the ReComm e-Commerce system.
-
-            Please log in.
-        </pre>
-        
-        <h:link outcome="/login.xhtml" value="Login" />
-        </div>
-
-        <div id="main">
-        </div>
-
-        <p>
-            <small>&nbsp;</small>
-        </p>
-        </ui:fragment>
     </ui:composition>
 </html>

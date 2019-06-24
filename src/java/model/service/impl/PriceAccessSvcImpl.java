@@ -15,6 +15,7 @@ import java.util.Collection;
 import model.domain.interfaces.IDomainObject;
 import java.util.Iterator;
 import model.business.error.Logger;
+import model.domain.interfaces.ISearchParms;
 import model.service.dao.HibernateSvc;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
@@ -43,13 +44,13 @@ public class PriceAccessSvcImpl extends HibernateSvc implements IPriceAccessSvc,
         Query query;
         Iterator<Prices> iterator;
 
-        if (session == null)
+        if (invsession == null)
         {
-            loadService();
+            loadService ("inv");
         }
 
-        transaction = session.beginTransaction();
-        query = session.createQuery ("from Prices");
+        transaction = invsession.beginTransaction();
+        query = invsession.createQuery ("from Prices");
         iterator = (Iterator<Prices>)query.iterate();
 
         while (iterator.hasNext())
@@ -100,19 +101,19 @@ public class PriceAccessSvcImpl extends HibernateSvc implements IPriceAccessSvc,
 		if (object != null)//validate
 		{
             users = (Collection<Prices>) object;
-            initSession();
+            initInvSession();
 
-            if (session != null)
+            if (invsession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = invsession.beginTransaction();
                     iterator = users.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newPrice = (Prices)iterator.next();
-                        session.save (newPrice);
+                        invsession.save (newPrice);
                     }
 
                     transaction.commit();
@@ -190,19 +191,19 @@ public class PriceAccessSvcImpl extends HibernateSvc implements IPriceAccessSvc,
 		if (object != null)//validate
 		{
             prices = (Collection<Prices>) object;
-            initSession();
+            initInvSession();
 
-            if (session != null)
+            if (invsession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = invsession.beginTransaction();
                     iterator = prices.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newPrice = (Prices)iterator.next();
-                        session.persist (newPrice);
+                        invsession.persist (newPrice);
                     }
 
                     transaction.commit();
@@ -252,12 +253,12 @@ public class PriceAccessSvcImpl extends HibernateSvc implements IPriceAccessSvc,
         Object[] userObject;
         Collection<Prices> prices = new ArrayList<Prices>();
 
-        if (session == null)
+        if (invsession == null)
         {
-            loadService();
+            loadService ("inv");
         }
 
-        object = (Prices)session.get (Prices.class, price.getIdPrices());
+        object = (Prices)invsession.get (Prices.class, price.getIdPrices());
 
 		return prices;
 	}
@@ -268,15 +269,15 @@ public class PriceAccessSvcImpl extends HibernateSvc implements IPriceAccessSvc,
         boolean result = false;
         Transaction transaction;
 
-        if (session == null)
+        if (invsession == null)
         {
-            loadService();
+            loadService ("inv");
         }
 
-        transaction = session.beginTransaction();
-        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
-        session.createSQLQuery ("TRUNCATE Prices").executeUpdate();
-        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
+        transaction = invsession.beginTransaction();
+        invsession.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
+        invsession.createSQLQuery ("TRUNCATE Prices").executeUpdate();
+        invsession.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
 
         transaction.commit();
         result = true;
@@ -296,19 +297,19 @@ public class PriceAccessSvcImpl extends HibernateSvc implements IPriceAccessSvc,
         if (object != null)//validate
         {
             prices = (Collection<Prices>) object;
-            initSession();
+            initInvSession();
 
-            if (session != null)
+            if (invsession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = invsession.beginTransaction();
                     iterator = prices.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newPrice = (Prices)iterator.next();
-                        session.merge (newPrice);
+                        invsession.merge (newPrice);
                     }
 
                     transaction.commit();
@@ -331,5 +332,10 @@ public class PriceAccessSvcImpl extends HibernateSvc implements IPriceAccessSvc,
         }
 
         return result;
+    }
+
+    @Override
+    public Collection<?> search(ISearchParms searchParms) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -5,6 +5,7 @@
  */
 package model.business.interfaces;
 
+import javax.servlet.http.HttpSession;
 import model.domain.interfaces.IUsers;
 
 /**
@@ -82,8 +83,12 @@ public interface IAuthenticate
     String resetPassword();
 
     String sendLogin();
-    
+
     IUsers getUserInfo();
-    
+
     void setUserInfo (IUsers userInfo);
+
+    void setSession();
+
+    HttpSession getSession();
 }

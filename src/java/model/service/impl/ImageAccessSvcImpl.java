@@ -10,6 +10,7 @@ import java.util.Collection;
 import model.domain.interfaces.IDomainObject;
 import java.util.Iterator;
 import model.business.error.Logger;
+import model.domain.interfaces.ISearchParms;
 import model.service.dao.HibernateSvc;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
@@ -38,14 +39,14 @@ public class ImageAccessSvcImpl extends HibernateSvc implements IImageAccessSvc,
         Query query;
         Iterator<Images> iterator;
 
-        if (session == null)
+        if (invsession == null)
         {
-            loadService();
+            loadService ("inv");
         }
         // else do nothing
 
-        transaction = session.beginTransaction();
-        query = session.createQuery ("from Images");
+        transaction = invsession.beginTransaction();
+        query = invsession.createQuery ("from Images");
         iterator = (Iterator<Images>)query.iterate();
 
         while (iterator.hasNext())
@@ -120,13 +121,13 @@ public class ImageAccessSvcImpl extends HibernateSvc implements IImageAccessSvc,
         Object[] userObject;
         Collection<Images> images = new ArrayList<Images>();
 
-        if (session == null)
+        if (invsession == null)
         {
-            loadService();
+            loadService ("inv");
         }
         // else do nothing
 
-        object = (Images)session.get (Images.class, image.getIdImages());
+        object = (Images)invsession.get (Images.class, image.getIdImages());
 
 		return images;
 	}
@@ -137,16 +138,16 @@ public class ImageAccessSvcImpl extends HibernateSvc implements IImageAccessSvc,
         boolean result = false;
         Transaction transaction;
 
-        if (session == null)
+        if (invsession == null)
         {
-            loadService();
+            loadService ("inv");
         }
         // else do nothing
 
-        transaction = session.beginTransaction();
-        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
-        session.createSQLQuery ("TRUNCATE Images").executeUpdate();
-        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
+        transaction = invsession.beginTransaction();
+        invsession.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
+        invsession.createSQLQuery ("TRUNCATE Images").executeUpdate();
+        invsession.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
 
         transaction.commit();
         result = true;
@@ -166,19 +167,19 @@ public class ImageAccessSvcImpl extends HibernateSvc implements IImageAccessSvc,
 		if (object != null)//validate
 		{
             images = (Collection<Images>) object;
-            initSession();
+            initInvSession();
 
-            if (session != null)
+            if (invsession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = invsession.beginTransaction();
                     iterator = images.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newImage = (Images)iterator.next();
-                        session.persist (newImage);
+                        invsession.persist (newImage);
                     }
 
                     transaction.commit();
@@ -227,19 +228,19 @@ public class ImageAccessSvcImpl extends HibernateSvc implements IImageAccessSvc,
 		if (object != null)//validate
 		{
             images = (Collection<Images>) object;
-            initSession();
+            initInvSession();
 
-            if (session != null)
+            if (invsession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = invsession.beginTransaction();
                     iterator = images.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newImage = (Images)iterator.next();
-                        session.save (newImage);
+                        invsession.save (newImage);
                     }
 
                     transaction.commit();
@@ -289,19 +290,19 @@ public class ImageAccessSvcImpl extends HibernateSvc implements IImageAccessSvc,
         if (object != null)//validate
         {
             images = (Collection<Images>) object;
-            initSession();
+            initInvSession();
 
-            if (session != null)
+            if (invsession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = invsession.beginTransaction();
                     iterator = images.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newImage = (Images)iterator.next();
-                        session.merge (newImage);
+                        invsession.merge (newImage);
                     }
 
                     transaction.commit();
@@ -324,5 +325,11 @@ public class ImageAccessSvcImpl extends HibernateSvc implements IImageAccessSvc,
         }
 
         return result;
+    }
+
+    @Override
+    public Collection<?> search (ISearchParms searchParms)
+    {
+        throw new UnsupportedOperationException ("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

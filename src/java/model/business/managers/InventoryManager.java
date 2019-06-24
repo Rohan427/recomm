@@ -6,8 +6,10 @@ package model.business.managers;
 import java.io.Serializable;
 import model.domain.inventory.Manufacturer;
 import java.util.Collection;
+import java.util.Iterator;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.servlet.http.HttpSession;
 
 import model.domain.inventory.Images;
 import model.domain.inventory.Items;
@@ -19,8 +21,12 @@ import model.service.interfaces.IPriceAccessSvc;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import model.business.interfaces.IInventoryManager;
+import model.domain.interfaces.IBrand;
 import model.domain.interfaces.IDomainObject;
+import model.domain.interfaces.IImages;
+import model.domain.interfaces.IItems;
 import model.domain.interfaces.IUsers;
+import model.domain.inventory.ItemSearchParams;
 import model.domain.users.Users;
 import model.service.interfaces.IUserAccessSvc;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +43,22 @@ public class InventoryManager implements IInventoryManager, Serializable
 {
 	/** The manager. */
     private final static Logger log = LogManager.getLogger (InventoryManager.class.getName());
+
+    private String partNo;
+
+    private String desc;
+
+    private String upc;
+
+    private String pageLimit;
+
+    private String sourcePage;
+
+    private String orderBy;
+
+    private HttpSession session;
+
+    private Collection<IItems> itemList;
 
     @Autowired
     private IPriceAccessSvc priceSvc;
@@ -56,7 +78,121 @@ public class InventoryManager implements IInventoryManager, Serializable
 	/**
 	 * Instantiates a new inventory manager.
 	 */
-	public InventoryManager() {}
+	public InventoryManager()
+    {
+    }
+
+    /**
+     * @return the orderBy
+     */
+    public String getOrderBy()
+    {
+        return orderBy;
+    }
+
+    /**
+     * @param orderBy the orderBy to set
+     */
+    public void setOrderBy (String orderBy)
+    {
+        this.orderBy = orderBy;
+    }
+
+    /**
+     * @return the partNo
+     */
+    public String getPartNo()
+    {
+        return partNo;
+    }
+
+    /**
+     * @param partNo the partNo to set
+     */
+    public void setPartNo (String partNo)
+    {
+        this.partNo = partNo;
+    }
+
+    /**
+     * @return the desc
+     */
+    public String getDesc()
+    {
+        return desc;
+    }
+
+    /**
+     * @param desc the desc to set
+     */
+    public void setDesc (String desc)
+    {
+        this.desc = desc;
+    }
+
+    /**
+     * @return the upc
+     */
+    public String getUpc()
+    {
+        return upc;
+    }
+
+    /**
+     * @param upc the upc to set
+     */
+    public void setUpc (String upc)
+    {
+        this.upc = upc;
+    }
+
+    /**
+     * @return the pageLimit
+     */
+    public String getPageLimit()
+    {
+        return pageLimit;
+    }
+
+    /**
+     * @param pageLimit the pageLimit to set
+     */
+    public void setPageLimit (String pageLimit)
+    {
+        this.pageLimit = pageLimit;
+    }
+
+    /**
+     * @return the sourcePage
+     */
+    public String getSourcePage()
+    {
+        return sourcePage;
+    }
+
+    /**
+     * @param sourcePage the sourcePage to set
+     */
+    public void setSourcePage (String sourcePage)
+    {
+        this.sourcePage = sourcePage;
+    }
+
+    /**
+     * @return the session
+     */
+    public HttpSession getSession()
+    {
+        return session;
+    }
+
+    /**
+     * @param session the session to set
+     */
+    public void setSession (HttpSession session)
+    {
+        this.session = session;
+    }
 
     @Override
     public void setPriceSvc (IPriceAccessSvc priceSvc)
@@ -89,6 +225,440 @@ public class InventoryManager implements IInventoryManager, Serializable
     }
 
     @Override
+    public Collection<IItems> findProducts (String cat)
+    {
+        int lastIndex = 0;
+        int limit = 25;
+        ItemSearchParams itemParms = new ItemSearchParams();
+        ItemSearchParams lastParms = null;
+        Collection<Manufacturer> mfgList = brandSvc.readBrands();
+
+        if (sourcePage != null)
+        {
+            if (!sourcePage.isEmpty())
+            {
+                session.setAttribute ("pageLimit", null);
+                session.setAttribute ("lastItemParms", null);
+                session.setAttribute ("itemList", null);
+                session.setAttribute ("mfgList", null);
+            }
+            //else do nothing
+        }
+        else
+        {
+            lastParms = (ItemSearchParams)session.getAttribute ("lastItemParms");
+        }
+
+        /**
+         * Retrieve last index number
+         * Get number to display on page as <number>
+         * Get <number> aircraft from database starting from index
+         * Save next index number
+         * Save index
+         * Display results
+         */
+        try
+        {
+            limit = Integer.parseInt (pageLimit);
+        }
+        catch (NumberFormatException e)
+        {
+
+        }
+
+        itemParms.setOrderBy ("partNo");
+
+        // Validate/format parameters
+        if (orderBy != null)
+        {
+            if (!orderBy.equals (""))
+            {
+                if (lastParms != null)
+                {
+                    itemParms = lastParms;
+                }
+                //else do nothing
+
+                lastParms = null;
+                itemParms.setOrderBy (orderBy);
+                itemParms.setAsc (!itemParms.isAsc());
+                itemParms.setLastIndex (0);
+            }
+        }
+
+        if (partNo != null)
+        {
+            if (!partNo.equals (""))
+            {
+                itemParms.setPartNo (partNo);
+            }
+        }
+
+        if (desc != null)
+        {
+            if (!desc.equals (""))
+            {
+                itemParms.setDesc ("%" + desc + "%");
+            }
+        }
+
+        if (upc != null)
+        {
+            if (!upc.equals (""))
+            {
+                itemParms.setUpc (upc);
+            }
+        }
+
+////        if (mfg != null)
+////        {
+////            if (!mfg.equals ("Select a Mfg"))
+////            {
+////                itemParms.setMfg (mfg);
+////            }
+////        }
+
+        itemParms.setId ("%");
+        itemParms.setName ("%");
+        itemParms.setCat (cat);
+        itemParms.setLimit (limit);
+
+        // If different parameters, reset index
+        if (!itemParms.equals (lastParms))
+        {
+            itemParms.setLastIndex (lastIndex);
+        }
+        else
+        {
+            if (lastParms != null)
+            {
+                lastIndex = lastParms.getLastIndex();
+                itemParms.setLastIndex (lastIndex);
+            }
+        }
+
+        itemList = (Collection<IItems>)itemSvc.search (itemParms);
+
+        if (itemList != null && itemList.size() >= 1)
+        {
+            Iterator itemItr = itemList.iterator();
+            IItems item;
+
+            // Get highest index key in list
+            int tempIndex = 0;
+
+            do
+            {
+                item = (IItems)itemItr.next();
+
+                if (item.getIdItems() > tempIndex)
+                {
+                    tempIndex = item.getIdItems();
+                }
+                //else do nothing
+            } while (itemItr.hasNext());
+
+            itemParms.setLastIndex (tempIndex);
+
+            // Validate/download Images
+            if (validateImages())
+            {
+                {
+                    System.err.println ("Success");
+                }
+            }
+        }
+        else
+        {
+            itemParms.setLastIndex (0);
+        }
+
+        session.setAttribute ("lastItemParms", itemParms);
+        session.setAttribute ("itemList", itemList);
+        session.setAttribute ("mfgList", mfgList);
+
+        return itemList;
+    }
+
+    private boolean validateImages()
+    {
+        boolean result = false;
+////        Iterator itemIter = itemList.iterator();
+////        String imageURL;
+////        String imageBigUrl;
+////        URL dlUrl;
+////        URL dlBigUrl;
+////        IImages curImage;
+////        IImages noImage;
+////        Collection<IImages> imageList = null;
+////        IItems item;
+////        IBrand curMan;
+////
+////        noImage = imageSvc.findImages ("/images/ProdInfo/img_not_available.gif").get (0);
+////
+////        do
+////        {
+////            item = (IItems)itemIter.next();
+////
+////            if (item.getImagesCollection().size() < 1)
+////            {
+////                imageList = new ArrayList<IImages>();
+////                curMan = brandSvc.findManufacturer (item.getManufactureridManufacturer().getIdManufacturer());
+////
+////                switch (item.getDist())
+////                {
+////                    case "H":
+////                        {
+////                            String tempPath = cfg.horDlPath
+////                                            + curMan.getMfgKey()
+////                                            + "/100/"
+////                                            + item.getPartNo()
+////                                            + "-100.jpg";
+////
+////                            try
+////                            {
+////                                dlUrl = new URL (tempPath);
+////
+////                                tempPath = cfg.horDlPath
+////                                         + curMan.getMfgKey()
+////                                         + "/450/"
+////                                         + item.getPartNo()
+////                                         + "-450.jpg";
+////                                dlBigUrl = new URL (tempPath);
+////
+////                                imageURL = cfg.imgLocPath
+////                                          + curMan.getMfgKey()
+////                                          + "/100/"
+////                                          + item.getPartNo()
+////                                          + "-100.jpg";
+////                                imageBigUrl = cfg.imgLocPath
+////                                             + curMan.getMfgKey()
+////                                             + "/450/"
+////                                             + item.getPartNo()
+////                                             + "-450.jpg";
+////
+////                                if (saveFile (dlUrl, cfg.imgPath + imageURL))
+////                                {
+////                                    curImage = new Images (0, imageURL, userSvc.findUsers (params.getUserInfo().getIdUsers()), new Date());
+////                                    List<IItems> newList = new ArrayList();
+////                                    item.setDefaultImage (curImage.getImagePath());
+////
+////                                    try
+////                                    {
+////                                        itemSvc.edit ((Items)item);
+////                                    }
+////                                    catch (Exception e)
+////                                    {
+////
+////                                    }
+////
+////                                    newList.add (item);
+////                                    curImage.setItemsCollection (newList);
+////
+////                                    try
+////                                    {
+////                                        imageSvc.edit ((Images)curImage);
+////                                        imageList.add ((Images)curImage);
+////                                    }
+////                                    catch (Exception e)
+////                                    {
+////
+////                                    }
+////                                }
+////                                else
+////                                {
+////                                    // Add this item to the noImage collection
+////                                    Collection<IItems> newList;
+////                                    newList = (Collection<IItems>)noImage.getItemsCollection();
+////                                    item.setDefaultImage (noImage.getImagePath());
+////
+////                                    try
+////                                    {
+////                                        itemSvc.edit ((Items)item);
+////                                    }
+////                                    catch (Exception e)
+////                                    {
+////
+////                                    }
+////
+////                                    newList.add (item);
+////                                    noImage.setItemsCollection (newList);
+////
+////                                    // Add image to this item's image collection
+////                                    imageList.add ((Images)noImage);
+////                                }
+////
+////                                if (saveFile (dlBigUrl, cfg.imgPath + imageBigUrl))
+////                                {
+////                                    curImage = new Images (0, imageBigUrl, userSvc.findUsers (params.getUserInfo().getIdUsers()), new Date());
+////                                    List<IItems> newList = new ArrayList();
+////                                    newList.add (item);
+////                                    curImage.setItemsCollection (newList);
+////
+////                                    try
+////                                    {
+////                                        imageSvc.edit ((Images)curImage);
+////                                        imageList.add ((Images)curImage);
+////                                    }
+////                                    catch (Exception e)
+////                                    {
+////
+////                                    }
+////                                }
+////                                else
+////                                {
+////                                    // Add this item to the noImage collection
+////                                    Collection<IItems> newList;
+////                                    newList = (Collection<IItems>)noImage.getItemsCollection();
+////                                    newList.add (item);
+////                                    noImage.setItemsCollection (newList);
+////
+////                                    // Add image to this item's image collection
+////                                    imageList.add ((Images)noImage);
+////                                }
+////
+////                                item.setImagesCollection (imageList);
+////                                result = true;
+////                            }
+////                            catch (MalformedURLException ex)
+////                            {
+////                                java.util.logging.Logger.getLogger (InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
+////                            }
+////                        }
+////
+////                        break;
+////
+////                    case "GP":
+////                        {
+////                            String tempPath = cfg.gpTinyDLPath
+////                                            + curMan.getMfgKey().substring (0, 1).toLowerCase()
+////                                            + "/t"
+////                                            + item.getPartNo().toLowerCase()
+////                                            + ".jpg";
+////                            try
+////                            {
+////                                dlUrl = new URL (tempPath);
+////
+////                                tempPath = cfg.gpLargeDLPath
+////                                         + curMan.getMfgKey().substring (0, 1).toLowerCase()
+////                                         + "/"
+////                                         + item.getPartNo().toLowerCase()
+////                                         + ".jpg";
+////                                dlBigUrl = new URL (tempPath);
+////
+////                                imageURL = cfg.imgLocPath
+////                                          + curMan.getMfgKey()
+////                                          + "/100/"
+////                                          + item.getPartNo()
+////                                          + "-100.jpg";
+////
+////                                imageBigUrl = cfg.imgLocPath
+////                                             + curMan.getMfgKey()
+////                                             + "/450/"
+////                                             + item.getPartNo()
+////                                             + "-450.jpg";
+////
+////                                if (saveFile (dlUrl, cfg.imgPath + imageURL))
+////                                {
+////                                    curImage = new Images (0, imageURL, usersJPA.findUsers (params.getUserInfo().getIdUsers()), new Date());
+////                                    List<IItems> newList = new ArrayList();
+////                                    item.setDefaultImage (curImage.getImagePath());
+////
+////                                    try
+////                                    {
+////                                        itemSvc.edit ((Items)item);
+////                                    }
+////                                    catch (Exception e)
+////                                    {
+////
+////                                    }
+////
+////                                    newList.add ((Items)item);
+////                                    curImage.setItemsCollection (newList);
+////
+////                                    try
+////                                    {
+////                                        itemSvc.edit ((Images)curImage);
+////                                        imageList.add (curImage);
+////                                    }
+////                                    catch (Exception e)
+////                                    {
+////
+////                                    }
+////                                }
+////                                else
+////                                {
+////                                    // Add this item to the noImage collection
+////                                    List<IItems> newList;
+////                                    newList = (List<IItems>)noImage.getItemsCollection();
+////                                    item.setDefaultImage (noImage.getImagePath());
+////
+////                                    try
+////                                    {
+////                                        itemSvc.edit ((Items)item);
+////                                    }
+////                                    catch (Exception e)
+////                                    {
+////
+////                                    }
+////
+////                                    newList.add ((Items)item);
+////                                    noImage.setItemsCollection (newList);
+////
+////                                    // Add image to this item's image collection
+////                                    imageList.add (noImage);
+////                                }
+////
+////                                if (saveFile (dlBigUrl, cfg.imgPath + imageBigUrl))
+////                                {
+////                                    curImage = new Images (0, imageBigUrl, userSvc.findUsers (params.getUserInfo().getIdUsers()), new Date());
+////                                    List<IItems> newList = new ArrayList();
+////                                    newList.add (item);
+////                                    curImage.setItemsCollection (newList);
+////
+////                                    try
+////                                    {
+////                                        imageSvc.edit (curImage);
+////                                        imageList.add (curImage);
+////                                    }
+////                                    catch (Exception e)
+////                                    {
+////
+////                                    }
+////                                }
+////                                else
+////                                {
+////                                    // Add this item to the noImage collection
+////                                    Collection<IItems> newList;
+////                                    newList = (Collection<IItems>)noImage.getItemsCollection();
+////                                    newList.add (item);
+////                                    noImage.setItemsCollection (newList);
+////
+////                                    // Add image to this item's image collection
+////                                    imageList.add (noImage);
+////                                }
+////
+////                                item.setImagesCollection (imageList);
+////                                result = true;
+////                            }
+////                            catch (MalformedURLException ex)
+////                            {
+////
+////                            }
+////                        }
+////
+////                        break;
+////
+////                    default:
+////                        break;
+////                }
+////            }
+////        } while (itemIter.hasNext());
+
+        return result;
+    }
+
+    @Override
     public synchronized Collection<?> find (String type, IDomainObject Object)
     {
         Collection<?> objectList = null;
@@ -100,7 +670,7 @@ public class InventoryManager implements IInventoryManager, Serializable
 				break;
 
 			case "price":
-				objectList = priceSvc.find (Object);
+////				objectList = priceSvc.find (Object);
 				break;
 
 			case "brand":
@@ -166,7 +736,7 @@ public class InventoryManager implements IInventoryManager, Serializable
 	{
 		Collection<Prices> prices = null;
 
-        prices = priceSvc.readPrices();
+////        prices = priceSvc.readPrices();
 		return prices;
 	}
 
@@ -457,11 +1027,11 @@ public class InventoryManager implements IInventoryManager, Serializable
         switch (command)
         {
             case "create":
-                result = priceSvc.updatePrice (price, false);
+////                result = priceSvc.updatePrice (price, false);
                 break;
 
             case "update":
-                result = priceSvc.updatePrice (price, true);
+////                result = priceSvc.updatePrice (price, true);
                 break;
 
             case "delete":
@@ -482,7 +1052,7 @@ public class InventoryManager implements IInventoryManager, Serializable
     @Override
     public synchronized Prices read (Prices price)
 	{
-        price = priceSvc.readPrice (price.getIdPrices());
+////        price = priceSvc.readPrice (price.getIdPrices());
 		return price;
 	}
 

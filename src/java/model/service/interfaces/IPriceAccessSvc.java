@@ -6,11 +6,10 @@ package model.service.interfaces;
 
 import model.domain.inventory.Prices;
 import java.util.Collection;
-import org.hibernate.Session;
 
 /**
  * Price Access Service interface
- * 
+ *
  * @author Paul G. Allen <pgallen@gmail.com>
  */
 public interface IPriceAccessSvc extends Ipersist
@@ -20,7 +19,7 @@ public interface IPriceAccessSvc extends Ipersist
      * @return
      */
     public Collection<Prices> readPrices ();
-    
+
     /**
      *
      * @param price
@@ -28,14 +27,14 @@ public interface IPriceAccessSvc extends Ipersist
      * @return
      */
     public boolean updatePrice (Prices price, boolean isUpdate);
-	
+
     /**
      *
      * @param idPrice
      * @return
      */
     public Prices readPrice (Integer idPrice);
-	
+
     /**
      *
      * @param price

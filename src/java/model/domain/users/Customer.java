@@ -14,33 +14,33 @@ import java.util.Date;
 
 /**
  * Customer domain object class
- * 
+ *
  * @author Paul G. Allen <pgallen@gmail.com>
  */
 public class Customer extends ICustomer implements Serializable
 {
     private static final long serialVersionUID = 23L;
-    
+
     private Integer idCustomer = 0;
-    
+
     private String firstName;
-    
+
     private String mi;
-    
+
     private String lName;
-    
+
     private Address address;
-    
+
     private String email;
-    
+
     private Date created;
-    
+
     private Users usersidUsers;
-    
+
     private Collection<IWishlist> wishlistCollection;
-    
+
     private Collection<ICart> cartCollection;
-    
+
     private int cachedHashCode;
 
     /**
@@ -54,25 +54,25 @@ public class Customer extends ICustomer implements Serializable
      *
      * @param idCustomer
      */
-    public Customer (Integer idCustomer) 
+    public Customer (Integer idCustomer)
     {
         this.idCustomer = idCustomer;
     }
-    
+
     /**
      *
      * @param firstName
      * @param lName
      * @param user
      */
-    public Customer (String firstName, 
+    public Customer (String firstName,
                      String lName,
-                     Users user
+                     IUsers user
                     )
     {
         this.firstName = firstName;
         this.lName = lName;
-        this.usersidUsers = user;
+        this.usersidUsers = (Users)user;
     }
 
     /**
@@ -88,24 +88,24 @@ public class Customer extends ICustomer implements Serializable
      * @param zipCode
      * @param created
      */
-    public Customer (Integer idCustomer, 
-                     String firstName, 
-                     String lName, 
+    public Customer (Integer idCustomer,
+                     String firstName,
+                     String lName,
                      String address1,
                      String address2,
-                     String city, 
-                     String state, 
-                     String country, 
+                     String city,
+                     String state,
+                     String country,
                      String zipCode,
                      Date created
-                    ) 
+                    )
     {
     	this.address = new Address (0,
 					                address1,
 					                address2,
-					                city, 
-					                state, 
-					                country, 
+					                city,
+					                state,
+					                country,
 					                zipCode,
 					                created
 					               );
@@ -200,7 +200,7 @@ public class Customer extends ICustomer implements Serializable
      * @return
      */
     @Override
-    public Address getAddress() 
+    public Address getAddress()
     {
         return address;
     }
@@ -290,11 +290,11 @@ public class Customer extends ICustomer implements Serializable
      * @param wishlistCollection
      */
     @Override
-    public void setWishlistCollection (Collection<IWishlist> wishlistCollection) 
+    public void setWishlistCollection (Collection<IWishlist> wishlistCollection)
     {
         this.wishlistCollection = wishlistCollection;
     }
-    
+
     /**
      *
      * @return
@@ -310,11 +310,11 @@ public class Customer extends ICustomer implements Serializable
      * @param cartCollection
      */
     @Override
-    public void setCartCollection (Collection<ICart> cartCollection) 
+    public void setCartCollection (Collection<ICart> cartCollection)
     {
         this.cartCollection = cartCollection;
     }
-    
+
     /**
      *
      * @return
@@ -338,35 +338,35 @@ public class Customer extends ICustomer implements Serializable
     }
 
     @Override
-    public int hashCode() 
+    public int hashCode()
     {
     	int hc = cachedHashCode;
-    	
-		if (hc == 0) 
+
+		if (hc == 0)
 		{
 			String varstr = idCustomer + firstName + mi + lName + address + email + created + usersidUsers;
 			hc = varstr.hashCode();
 		}
-		  
+
 		return hc;
     }
 
     @Override
-    public boolean equals (Object object) 
+    public boolean equals (Object object)
     {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Customer)) 
+        if (!(object instanceof Customer))
         {
             return false;
         }
-        
+
         Customer other = (Customer) object;
-        
+
         if ((this.idCustomer == null && other.idCustomer != null) || (this.idCustomer != null && !this.idCustomer.equals (other.idCustomer)))
         {
             return false;
         }
-        
+
         return true;
     }
 

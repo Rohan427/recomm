@@ -7,6 +7,7 @@ package model.service.interfaces;
 import java.util.Collection;
 import model.service.dao.HashedObjectWrapper;
 import model.domain.interfaces.IDomainObject;
+import model.domain.interfaces.ISearchParms;
 
 /**
  * Persistence interface
@@ -34,4 +35,6 @@ public interface Ipersist extends IService
     boolean save (Collection<?> object);
 
     boolean merge (Collection<?> object);
+
+    Collection<?> search (ISearchParms searchParms);
 }

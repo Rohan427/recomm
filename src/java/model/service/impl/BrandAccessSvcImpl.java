@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import model.business.error.Logger;
+import model.domain.interfaces.ISearchParms;
 import model.service.dao.HibernateSvc;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
@@ -39,15 +40,15 @@ public class BrandAccessSvcImpl extends HibernateSvc implements IBrandAccessSvc,
         boolean result = false;
         Transaction transaction;
 
-        if (session == null)
+        if (invsession == null)
         {
-            loadService();
+            loadService ("inv");
         }
 
-        transaction = session.beginTransaction();
-        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
-        session.createSQLQuery ("TRUNCATE Manufacturer").executeUpdate();
-        session.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
+        transaction = invsession.beginTransaction();
+        invsession.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
+        invsession.createSQLQuery ("TRUNCATE Manufacturer").executeUpdate();
+        invsession.createSQLQuery ("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
 
         transaction.commit();
         result = true;
@@ -64,13 +65,13 @@ public class BrandAccessSvcImpl extends HibernateSvc implements IBrandAccessSvc,
         Object[] userObject;
         Collection<Manufacturer> mfgs = new ArrayList<Manufacturer>();
 
-        if (session == null)
+        if (invsession == null)
         {
-            loadService();
+            loadService ("inv");
         }
 
-        transaction = session.beginTransaction();
-        object = (Manufacturer)session.get (Manufacturer.class, brand.getIdBrand());
+        transaction = invsession.beginTransaction();
+        object = (Manufacturer)invsession.get (Manufacturer.class, brand.getIdBrand());
         transaction.commit();
 
 		return mfgs;
@@ -90,13 +91,13 @@ public class BrandAccessSvcImpl extends HibernateSvc implements IBrandAccessSvc,
         Query query;
         Iterator<Manufacturer> iterator;
 
-        if (session == null)
+        if (invsession == null)
         {
-            loadService();
+            loadService ("inv");
         }
 
-        transaction = session.beginTransaction();
-        query = session.createQuery ("from Manufacturer");
+        transaction = invsession.beginTransaction();
+        query = invsession.createQuery ("from Manufacturer");
         iterator = (Iterator<Manufacturer>)query.iterate();
 
         while (iterator.hasNext())
@@ -147,19 +148,19 @@ public class BrandAccessSvcImpl extends HibernateSvc implements IBrandAccessSvc,
 		if (object != null)//validate
 		{
             mfgs = (Collection<Manufacturer>) object;
-            initSession();
+            initInvSession();
 
-            if (session != null)
+            if (invsession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = invsession.beginTransaction();
                     iterator = mfgs.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newMfg = (Manufacturer)iterator.next();
-                        session.persist (newMfg);
+                        invsession.persist (newMfg);
                     }
 
                     transaction.commit();
@@ -208,19 +209,19 @@ public class BrandAccessSvcImpl extends HibernateSvc implements IBrandAccessSvc,
 		if (object != null)//validate
 		{
             mfgs = (Collection<Manufacturer>) object;
-            initSession();
+            initInvSession();
 
-            if (session != null)
+            if (invsession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = invsession.beginTransaction();
                     iterator = mfgs.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newMfg = (Manufacturer)iterator.next();
-                        session.save (newMfg);
+                        invsession.save (newMfg);
                     }
 
                     transaction.commit();
@@ -270,19 +271,19 @@ public class BrandAccessSvcImpl extends HibernateSvc implements IBrandAccessSvc,
         if (object != null)//validate
         {
             mfgs = (Collection<Manufacturer>) object;
-            initSession();
+            initInvSession();
 
-            if (session != null)
+            if (invsession != null)
             {
                 try
                 {
-                    transaction = session.beginTransaction();
+                    transaction = invsession.beginTransaction();
                     iterator = mfgs.iterator();
 
                     while (iterator.hasNext() && result)
                     {
                         newMfg = (Manufacturer)iterator.next();
-                        session.merge (newMfg);
+                        invsession.merge (newMfg);
                     }
 
                     transaction.commit();
@@ -305,5 +306,13 @@ public class BrandAccessSvcImpl extends HibernateSvc implements IBrandAccessSvc,
         }
 
         return result;
+    }
+
+    @Override
+    public Collection<?> search (ISearchParms searchParms)
+    {
+        Collection<Manufacturer> mfgList = new ArrayList<Manufacturer>();
+
+        return mfgList;
     }
 }
