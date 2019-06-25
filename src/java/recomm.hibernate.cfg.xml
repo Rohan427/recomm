@@ -43,9 +43,10 @@ Contributor(s):
     <session-factory>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
         <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/customer?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull</property>
-        <property name="hibernate.connection.username">root</property>
-        <property name="hibernate.connection.password">root</property>
+        <property name="hibernate.connection.url">jdbc:mysql://[DB_HOST/DB_NAME]/recomm?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull</property>
+        <property name="hibernate.connection.username">recomm</property>
+        <property name="hibernate.connection.password">[DB_PASSWORD]</property>
+
 
         <!-- Enable Hibernate's automatic session context management -->
         <property name="current_session_context_class">thread</property>
@@ -56,6 +57,9 @@ Contributor(s):
         <!-- Echo all executed SQL to stdout -->
         <property name="show_sql">true</property>
 
-        <mapping class="model.domain.users.Users"/>
+        <mapping class="model.domain.inventory.Items"/>
+        <mapping class="model.domain.inventory.Images"/>
+        <mapping class="model.domain.inventory.Manufacturer"/>
+        <mapping class="model.domain.inventory.Prices"/>
     </session-factory>
 </hibernate-configuration>
