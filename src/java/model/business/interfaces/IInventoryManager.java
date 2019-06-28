@@ -7,6 +7,7 @@ package model.business.interfaces;
 
 import java.util.Collection;
 import model.domain.interfaces.IDomainObject;
+import model.domain.interfaces.IImages;
 import model.domain.interfaces.IItems;
 import model.domain.interfaces.IUsers;
 import model.domain.inventory.Images;
@@ -33,6 +34,7 @@ public interface IInventoryManager extends IDAOManager
      * @param type The DAO type to delete
      * @return true if DAO deleted, false if not
      */
+    @Override
     boolean deleteAll (String type);
 
     void setBrandSvc (IBrandAccessSvc brandSvc);
@@ -87,6 +89,7 @@ public interface IInventoryManager extends IDAOManager
      * @param type
      * @return
      */
+    @Override
     Collection<?> readAll (String type);
 
     /**
@@ -94,6 +97,7 @@ public interface IInventoryManager extends IDAOManager
      * @param type
      * @return
      */
+    @Override
     Collection<?> readNext (String type);
 
     /**
@@ -103,6 +107,7 @@ public interface IInventoryManager extends IDAOManager
      * @param max
      * @return
      */
+    @Override
     Collection<?> readRange (String type, Integer min, Integer max);
 
     //Items methods
@@ -151,4 +156,34 @@ public interface IInventoryManager extends IDAOManager
     boolean update (IUsers user, String command);
 
     Collection<IItems> findProducts (String cat);
+
+    String getOrderBy();
+
+    void setOrderBy (String orderBy);
+
+    String getSourcePage();
+
+    IImages getImage();
+
+    String getPageTitle();
+
+    void setPageTitle (String pageTitle);
+
+    String getPartNo();
+
+    void setPartNo (String partNo);
+
+    String getDesc();
+
+    void setDesc (String desc);
+
+    String getUpc();
+
+    void setUpc (String upc);
+
+    String getPageLimit();
+
+    void setPageLimit (String pageLimit);
+
+    void setSourcePage (String sourcePage);
 }

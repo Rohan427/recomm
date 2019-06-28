@@ -168,11 +168,13 @@ public class AuthenticateManager implements IAuthenticate
         this.cfmPassword = cfmPassword;
     }
 
+    @Override
     public HttpSession getSession()
     {
         return this.session;
     }
 
+    @Override
     public void setSession()
     {
         FacesContext facesContext = FacesContext.getCurrentInstance();

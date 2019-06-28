@@ -53,7 +53,7 @@ public class LoginBean implements Serializable
      */
     public String getFname()
     {
-        return authenticate.getFname ();
+        return authenticate.getFname();
     }
 
     /**

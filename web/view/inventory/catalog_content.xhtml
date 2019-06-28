@@ -23,45 +23,37 @@
             <div style="width: 500px">
                 <h:form>
                     <p class="form1">
-                        Part Number:<input class="frightc"
-                                          type="text"
-                                          name="partNo"
-                                          title="Part Number"
-                                          size="45"
-                                          value="#{inventoryBean.partNo}"
+                        Part Number:<h:inputText class="frightc"
+                                                 title="Part Number"
+                                                 size="45"
+                                                 value="#{inventoryBean.partNo}"
                                    />
                     </p>
                     <p class="form2">
-                        Description:<input class="frightc"
-                                           type="text"
-                                           name="desc"
-                                           title="Description"
-                                           size="45"
-                                           value="#{inventoryBean.desc}"
+                        Description:<h:inputText class="frightc"
+                                                 title="Description"
+                                                 size="45"
+                                                 value="#{inventoryBean.desc}"
                                     />
                     </p>
                     <p class="form1">
-                        UPC:<input class="frightc"
-                                   type="text"
-                                   name="upc"
-                                   title="UPC"
-                                   size="45"
-                                   value="#{inventoryBean.upc}"
+                        UPC:<h:inputText class="frightc"
+                                         title="UPC"
+                                         size="45"
+                                         value="#{inventoryBean.upc}"
                             />
                     </p>
                     <p class="form2">
-                        Items per Page:<input class="frightc"
-                                              type="text"
-                                              name="pageLimit"
-                                              title="Items per page"
-                                              size="45"
-                                              value="#{inventoryBean.pageLimit}"
+                        Items per Page:<h:inputText class="frightc"
+                                                    title="Items per page"
+                                                    size="45"
+                                                    value="#{inventoryBean.pageLimit}"
                                        />
                     </p>
                     <p>
                         <h:commandButton value = "Submit"
                                          type = "submit"
-                                         action = "#{inventoryBean.findProduct()}"
+                                         action = "#{inventoryBean.findProduct}"
                         >
                             <f:param name="pageTitle" value="Catalog" />
                             <f:param name="sourcePage" value="catalog.xhtml" />
@@ -161,7 +153,7 @@
                             <td>
                                 <img src="../..#{itemSet.defaultImage}" height="100" width="100" /><br/>
                                 <h:form>
-                                    <h:commandButton action="../products/getImage.jsp"
+                                    <h:commandButton action="#{inventoryBean.getImage}"
                                                      type="submit"
                                                      value="View Image"
                                                      label="Submit"

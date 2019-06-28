@@ -102,12 +102,7 @@ public class Manufacturer extends IBrand implements Serializable
     @Column (name = "Users_idUsers")
     private Integer usersidUsers;
 
-////    @Basic (optional = false)
-////    @Column (nullable = false, length = 45)
-////    private String creation;
-    
     @Basic(optional = false)
-////    @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date creation;
 
@@ -123,9 +118,9 @@ public class Manufacturer extends IBrand implements Serializable
         this.idBrand = idManufacturer;
     }
 
-    public Manufacturer (Integer idBrand, 
-                  String brandKey, 
-                  String name, 
+    public Manufacturer (Integer idBrand,
+                  String brandKey,
+                  String name,
                   Date creation,
                   Integer users
                  )
@@ -293,7 +288,7 @@ public class Manufacturer extends IBrand implements Serializable
     {
         this.itemsCollection = itemsCollection;
     }
-    
+
     /**
      *
      * @return
@@ -316,7 +311,7 @@ public class Manufacturer extends IBrand implements Serializable
     public boolean equals (Object object)
     {
         boolean result = true;
-        
+
         // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Manufacturer))
         {
@@ -328,18 +323,18 @@ public class Manufacturer extends IBrand implements Serializable
 
             if ((this.brandName == null && other.brandName != null) ||
                 (this.brandName != null && !this.brandName.equalsIgnoreCase (other.brandName))
-               ) 
+               )
             {
                 result = false;
             }
             else if ((this.brandKey == null && other.brandKey != null) ||
                      (this.brandKey != null && !this.brandKey.equals (other.brandKey))
-                    ) 
+                    )
             {
                 result = false;
             }
         }
-        
+
         return result;
     }
 
@@ -352,12 +347,12 @@ public class Manufacturer extends IBrand implements Serializable
     public boolean compareBrandKey (IBrand other)
     {
         boolean result = true;
-        
+
         if (!this.brandKey.equals (other.getBrandKey()))
         {
             result = false;
         }
-        
+
         return result;
     }
 

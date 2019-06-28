@@ -12,7 +12,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import model.business.interfaces.IAuthenticate;
-import model.business.managers.InventoryManager;
+import model.business.interfaces.IInventoryManager;
+import model.domain.interfaces.IImages;
 import model.domain.interfaces.IItems;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,47 +27,36 @@ import org.springframework.stereotype.Component;
 @SessionScoped
 public class InventoryBean implements Serializable
 {
-    @ManagedProperty ("#{param.pageTitle}")
-    private String pageTitle = "Catalog";
-
-    private String partNo;
-
-    private String desc;
-
-    private String upc;
-
-    private String pageLimit;
-
-    @ManagedProperty ("#{param.sourcePage}")
-    private String sourcePage = "catalog.xhtml";
-
-    @ManagedProperty ("#{param.orderBy}")
-    private String orderBy;
-
     private Collection<IItems> itemList = new ArrayList<IItems>();
 
     @Autowired
     private IAuthenticate authenticate;
 
     @Autowired
-    private InventoryManager manager;
+    private IInventoryManager manager;
+
+    public void setAuthenticate (IAuthenticate authenticate)
+    {
+        this.authenticate = authenticate;
+    }
+
+    public void setManager (IInventoryManager manager)
+    {
+        this.manager = manager;
+    }
 
     public String findProduct()
     {
         String resultPage = "catalog.xhtml";
-        authenticate.setSession();
 
-        manager.setDesc (desc);
-        manager.setOrderBy (orderBy);
-        manager.setPageLimit (pageLimit);
-        manager.setPartNo (partNo);
-        manager.setSourcePage (sourcePage);
-        manager.setUpc (upc);
-        manager.setSession (authenticate.getSession());
         itemList = manager.findProducts ("item");
-        sourcePage = manager.getSourcePage();
 
         return resultPage;
+    }
+
+    public IImages getImage()
+    {
+        return manager.getImage();
     }
 
     /**
@@ -74,7 +64,7 @@ public class InventoryBean implements Serializable
      */
     public String getPageTitle()
     {
-        return pageTitle;
+        return manager.getPageTitle();
     }
 
     /**
@@ -82,7 +72,7 @@ public class InventoryBean implements Serializable
      */
     public void setPageTitle (String pageTitle)
     {
-        this.pageTitle = pageTitle;
+        manager.setPageTitle (pageTitle);
     }
 
     /**
@@ -90,7 +80,7 @@ public class InventoryBean implements Serializable
      */
     public String getPartNo()
     {
-        return partNo;
+        return manager.getPartNo();
     }
 
     /**
@@ -98,7 +88,7 @@ public class InventoryBean implements Serializable
      */
     public void setPartNo (String partNo)
     {
-        this.partNo = partNo;
+        manager.setPartNo (partNo);
     }
 
     /**
@@ -106,15 +96,15 @@ public class InventoryBean implements Serializable
      */
     public String getDesc()
     {
-        return desc;
+        return manager.getDesc();
     }
 
     /**
      * @param desc the desc to set
      */
-    public void setDesc(String desc)
+    public void setDesc (String desc)
     {
-        this.desc = desc;
+        manager.setDesc (desc);
     }
 
     /**
@@ -122,15 +112,15 @@ public class InventoryBean implements Serializable
      */
     public String getUpc()
     {
-        return upc;
+        return manager.getUpc();
     }
 
     /**
      * @param upc the upc to set
      */
-    public void setUpc(String upc)
+    public void setUpc (String upc)
     {
-        this.upc = upc;
+        manager.setUpc (upc);
     }
 
     /**
@@ -138,15 +128,15 @@ public class InventoryBean implements Serializable
      */
     public String getPageLimit()
     {
-        return pageLimit;
+        return manager.getPageLimit();
     }
 
     /**
      * @param pageLimit the pageLimit to set
      */
-    public void setPageLimit(String pageLimit)
+    public void setPageLimit (String pageLimit)
     {
-        this.pageLimit = pageLimit;
+        manager.setPageLimit (pageLimit);
     }
 
     /**
@@ -154,15 +144,15 @@ public class InventoryBean implements Serializable
      */
     public String getSourcePage()
     {
-        return sourcePage;
+        return manager.getSourcePage();
     }
 
     /**
      * @param sourcePage the sourcePage to set
      */
-    public void setSourcePage(String sourcePage)
+    public void setSourcePage (String sourcePage)
     {
-        this.sourcePage = sourcePage;
+        manager.setSourcePage (sourcePage);
     }
 
     /**
@@ -186,7 +176,7 @@ public class InventoryBean implements Serializable
      */
     public String getOrderBy()
     {
-        return orderBy;
+        return manager.getOrderBy();
     }
 
     /**
@@ -194,6 +184,6 @@ public class InventoryBean implements Serializable
      */
     public void setOrderBy (String orderBy)
     {
-        this.orderBy = orderBy;
+        manager.setOrderBy (orderBy);
     }
 }

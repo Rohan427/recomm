@@ -7,8 +7,8 @@ import java.io.Serializable;
 import model.domain.inventory.Manufacturer;
 import java.util.Collection;
 import java.util.Iterator;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
 
 import model.domain.inventory.Images;
@@ -30,15 +30,13 @@ import model.domain.inventory.ItemSearchParams;
 import model.domain.users.Users;
 import model.service.interfaces.IUserAccessSvc;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Paul G. Allen <pgallen@gmail.com>
  */
-@Component
-@ManagedBean
-@SessionScoped
+@Service
 public class InventoryManager implements IInventoryManager, Serializable
 {
 	/** The manager. */
@@ -52,11 +50,16 @@ public class InventoryManager implements IInventoryManager, Serializable
 
     private String pageLimit;
 
-    private String sourcePage;
+    @ManagedProperty ("#{param.sourcePage}")
+    private String sourcePage = "catalog.xhtml";
 
-    private String orderBy;
+    @ManagedProperty ("#{param.orderBy}")
+    private String orderBy = "partNo";
 
     private HttpSession session;
+
+    @ManagedProperty ("#{param.pageTitle}")
+    private String pageTitle = "Catalog";
 
     private Collection<IItems> itemList;
 
@@ -82,9 +85,38 @@ public class InventoryManager implements IInventoryManager, Serializable
     {
     }
 
+    public void setSession()
+    {
+        String temp;
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        session = (HttpSession) facesContext.getExternalContext().getSession (false);
+
+        temp = facesContext.getExternalContext().getRequestParameterMap().get ("sourcePage");
+
+        if (temp != null)
+        {
+            sourcePage = temp;
+        }
+
+        temp = facesContext.getExternalContext().getRequestParameterMap().get ("orderBy");
+
+        if (temp != null)
+        {
+            orderBy = temp;
+        }
+
+        temp = facesContext.getExternalContext().getRequestParameterMap().get ("pageTitle");
+
+        if (temp != null)
+        {
+            pageTitle = temp;
+        }
+    }
+
     /**
      * @return the orderBy
      */
+    @Override
     public String getOrderBy()
     {
         return orderBy;
@@ -93,6 +125,7 @@ public class InventoryManager implements IInventoryManager, Serializable
     /**
      * @param orderBy the orderBy to set
      */
+    @Override
     public void setOrderBy (String orderBy)
     {
         this.orderBy = orderBy;
@@ -101,6 +134,7 @@ public class InventoryManager implements IInventoryManager, Serializable
     /**
      * @return the partNo
      */
+    @Override
     public String getPartNo()
     {
         return partNo;
@@ -109,6 +143,7 @@ public class InventoryManager implements IInventoryManager, Serializable
     /**
      * @param partNo the partNo to set
      */
+    @Override
     public void setPartNo (String partNo)
     {
         this.partNo = partNo;
@@ -117,6 +152,7 @@ public class InventoryManager implements IInventoryManager, Serializable
     /**
      * @return the desc
      */
+    @Override
     public String getDesc()
     {
         return desc;
@@ -125,6 +161,7 @@ public class InventoryManager implements IInventoryManager, Serializable
     /**
      * @param desc the desc to set
      */
+    @Override
     public void setDesc (String desc)
     {
         this.desc = desc;
@@ -133,6 +170,7 @@ public class InventoryManager implements IInventoryManager, Serializable
     /**
      * @return the upc
      */
+    @Override
     public String getUpc()
     {
         return upc;
@@ -149,6 +187,7 @@ public class InventoryManager implements IInventoryManager, Serializable
     /**
      * @return the pageLimit
      */
+    @Override
     public String getPageLimit()
     {
         return pageLimit;
@@ -165,6 +204,7 @@ public class InventoryManager implements IInventoryManager, Serializable
     /**
      * @return the sourcePage
      */
+    @Override
     public String getSourcePage()
     {
         return sourcePage;
@@ -231,7 +271,10 @@ public class InventoryManager implements IInventoryManager, Serializable
         int limit = 25;
         ItemSearchParams itemParms = new ItemSearchParams();
         ItemSearchParams lastParms = null;
-        Collection<Manufacturer> mfgList = brandSvc.readBrands();
+        Collection<Manufacturer> mfgList;
+
+        setSession();
+        mfgList = brandSvc.readBrands();
 
         if (sourcePage != null)
         {
@@ -382,7 +425,7 @@ public class InventoryManager implements IInventoryManager, Serializable
 
     private boolean validateImages()
     {
-        boolean result = false;
+        boolean result = true;
 ////        Iterator itemIter = itemList.iterator();
 ////        String imageURL;
 ////        String imageBigUrl;
@@ -1149,5 +1192,25 @@ public class InventoryManager implements IInventoryManager, Serializable
     public boolean validate()
     {
         return true;
+    }
+
+    @Override
+    public String getPageTitle()
+    {
+        return pageTitle;
+    }
+
+    @Override
+    public void setPageTitle (String pageTitle)
+    {
+        this.pageTitle = pageTitle;
+    }
+
+    @Override
+    public IImages getImage()
+    {
+        setSession();
+
+        return null;
     }
 }

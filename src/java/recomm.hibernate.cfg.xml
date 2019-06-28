@@ -43,16 +43,19 @@ Contributor(s):
     <session-factory>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
         <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-        <property name="hibernate.connection.url">jdbc:mysql://[DB_HOST/DB_NAME]/recomm?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull</property>
+        <property name="hibernate.connection.url">jdbc:mysql://[CUSTOMER_DB_HOST]:[PORT]/recomm?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull</property>
         <property name="hibernate.connection.username">recomm</property>
-        <property name="hibernate.connection.password">[DB_PASSWORD]</property>
-
+        <property name="hibernate.connection.password">[CUSTOMER_DB_PASSWORD]</property>
 
         <!-- Enable Hibernate's automatic session context management -->
         <property name="current_session_context_class">thread</property>
 
         <!-- Disable the second-level cache -->
         <property name="cache.provider_class">org.hibernate.cache.internal.NoCacheProvider</property>
+
+        <property name="hibernate.c3p0.min_size">5</property>
+        <property name="hibernate.c3p0.max_size">20</property>
+        <property name="hibernate.c3p0.timeout">300</property>
 
         <!-- Echo all executed SQL to stdout -->
         <property name="show_sql">true</property>
