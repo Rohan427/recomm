@@ -8,6 +8,7 @@
                            http://www.springframework.org/schema/context/spring-context-4.0.xsd"
 
 >
-    <context:component-scan base-package="model.service.impl" />
-	<context:component-scan base-package="model.business.managers" />
+    <context:component-scan base-package="com.recomm.model.service" />
+	<context:component-scan base-package="com.recomm.business.managers" />
+	<context:component-scan base-package="com.recomm.model.domain" />
 </beans>

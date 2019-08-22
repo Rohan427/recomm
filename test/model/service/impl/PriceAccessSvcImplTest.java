@@ -5,15 +5,16 @@
 
 package model.service.impl;
 
+import com.recomm.model.domain.inventory.service.impl.PriceAccessSvcImpl;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import model.domain.inventory.Prices;
-import model.service.dao.HashedObjectWrapper;
-import model.domain.interfaces.IDomainObject;
+import com.recomm.model.domain.inventory.entity.Prices;
+import com.recomm.model.service.beans.HashedObjectWrapper;
+import com.recomm.model.domain.interfaces.IDomainObject;
 import java.math.BigDecimal;
 import java.util.Date;
 

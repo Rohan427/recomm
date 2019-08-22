@@ -1,5 +1,6 @@
 package model.domain.users;
 
+import com.recomm.model.domain.users.entity.Users;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

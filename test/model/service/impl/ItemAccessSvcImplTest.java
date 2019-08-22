@@ -5,6 +5,7 @@
 
 package model.service.impl;
 
+import com.recomm.model.domain.inventory.service.impl.ItemAccessSvcImpl;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,12 +13,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import model.domain.inventory.Items;
-import model.service.dao.HashedObjectWrapper;
-import model.domain.interfaces.IDomainObject;
-import model.domain.inventory.Manufacturer;
-import model.domain.inventory.Images;
-import model.domain.inventory.Prices;
+import com.recomm.model.domain.inventory.entity.Items;
+import com.recomm.model.service.beans.HashedObjectWrapper;
+import com.recomm.model.domain.interfaces.IDomainObject;
+import com.recomm.model.domain.inventory.entity.Manufacturer;
+import com.recomm.model.domain.inventory.entity.Images;
+import com.recomm.model.domain.inventory.entity.Prices;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.Date;

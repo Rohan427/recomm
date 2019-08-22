@@ -6,14 +6,15 @@
 package model.service.impl;
 
 
+import com.recomm.model.domain.inventory.service.impl.ImageAccessSvcImpl;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import model.domain.inventory.Images;
-import model.service.dao.HashedObjectWrapper;
+import com.recomm.model.domain.inventory.entity.Images;
+import com.recomm.model.service.beans.HashedObjectWrapper;
 import java.util.Date;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

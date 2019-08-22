@@ -75,7 +75,9 @@
                 <table class="Search" cellpadding="0" cellspacing="0">
                     <tbody>
                         <tr class="heading">
-                            <td></td>
+                            <td>
+                                <h3>Images</h3>
+                            </td>
                             <td>
                                 <h3>
                                     <h:link outcome = "#{inventoryBean.sourcePage}" >
@@ -131,38 +133,36 @@
                         <ui:repeat value="#{inventoryBean.itemList}" var="itemSet" >
                         <tr class="data1">
 
-                            <ui:fragment rendered="#{!empty itemSet.image}" >
+                        <ui:fragment rendered="#{!empty itemSet.image}" >
                             <td>
                                 <div id="links" align="center">
                                     <div class="thumbnail"
-                                         style="background-image: url('../../images/ProdInfo/img_not_available.gif');
-                                                background-repeat:no-repeat;
+                                         style="background-image: url('/images/ProdInfo/img_not_available.gif');
+                                                background-repeat: no-repeat;
                                                 background-size: 100px 100px;
                                                 height: 100px;
                                                 width: 100px;"
                                     >
-                                        <h:link outcome = "../../images/ProdInfo/#{itemSet.brand.brandKey}/450/#{itemSet.partNo}-450.jpg" target="_blank" >
-                                            <h:graphicImage value="../../images/ProdInfo/#{itemSet.brand.brandKey}/450/#{itemSet.partNo}-450.jpg" />
+                                        <h:link outcome = "/images/ProdInfo/#{itemSet.brand.brandKey}/450/#{itemSet.partNo}-450.jpg" target="_blank" >
+                                            <h:graphicImage value="/images/ProdInfo/#{itemSet.brand.brandKey}/450/#{itemSet.partNo}-450.jpg" />
                                         </h:link>
                                     </div>
                                 </div>
                             </td>
-                            </ui:fragment>
+                        </ui:fragment>
 
-                            <ui:fragment>
+                        <ui:fragment rendered="#{empty itemSet.image}">
                             <td>
-                                <img src="../..#{itemSet.defaultImage}" height="100" width="100" /><br/>
+                                <img src="../../#{itemSet.defaultImage}" height="100" width="100" /><br/>
                                 <h:form>
                                     <h:commandButton action="#{inventoryBean.getImage}"
-                                                     type="submit"
                                                      value="View Image"
-                                                     label="Submit"
                                     >
                                         <f:param name="image" value="#{itemSet.brand.brandKey}" />
                                     </h:commandButton>
                                 </h:form>
                             </td>
-                                </ui:fragment>
+                        </ui:fragment>
 
                             <td>
                                 #{itemSet.partNo}
@@ -193,18 +193,18 @@
                                         <tr>
                                             <td>
                                                 <div id="links" align="center">
-                                                    <h:form target="_blank">
-                                                        <f:param name="pageTitle" value="Cart" />
-                                                        <f:param name="itemId" value="#{itemSet.idItems}" />
+                                                    <h:form>
                                                             <div class="thumbnail" >
                                                                 <h:commandButton action="#{cartBean.cartAdd()}"
-                                                                                 type="submit"
                                                                                  image="../../images/green-cart-button-hi.png"
                                                                                  style="background-repeat: no-repeat;
                                                                                         background-size: 60px 60px;
                                                                                         width: 60px;
                                                                                         height: 60px;"
-                                                                />
+                                                                >
+                                                                    <f:param name="pageTitle" value="Cart" />
+                                                                    <f:param name="itemId" value="#{itemSet.idItems}" />
+                                                                </h:commandButton>
                                                             </div>
                                                     </h:form>
                                                 </div>
@@ -212,13 +212,13 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <h:form target="_blank">
-                                                    <f:param name="pageTitle" value="Wish List" />
-                                                    <f:param name="itemId" value="#{itemSet.idItems}" />
+                                                <h:form>
                                                     <h:commandButton action="#{cartBean.wishlistAdd()}"
                                                                      value="+ Wish List"
-                                                                     type="submit"
-                                                    />
+                                                    >
+                                                        <f:param name="pageTitle" value="Wish List" />
+                                                        <f:param name="itemId" value="#{itemSet.idItems}" />
+                                                    </h:commandButton>
                                                 </h:form>
                                             </td>
                                         </tr>

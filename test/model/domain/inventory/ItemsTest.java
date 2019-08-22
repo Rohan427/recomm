@@ -3,6 +3,7 @@
  */
 package model.domain.inventory;
 
+import com.recomm.model.domain.inventory.entity.Items;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+>
+    <ui:composition>
+
+<!-- ++++++++++++++++++++++ Begin Page Content ++++++++++++++++++++++++ -->
+
+        <div class="div_header">
+            <h1>Wish List</h1>
+        </div>
+
+        <div id="vert_menu">
+            <a href="wishlist.xhtml">PlaceHolder 1</a><br />
+            <a href="wishlist.xhtml">PlaceHolder 2</a><br />
+            <a href="wishlist.xhtml">PlaceHolder 3</a><br />
+        </div>
+        <div class="res_div_header">
+            <h:outputText value="#{param.pageTitle}" />
+        </div>
+
+        <div class="res_div_main">
+            <div>
+                <table class="fileSearch" cellpadding="0" cellspacing="0">
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="results">
+                                <h2><h:outputText value="Wish List" /></h2>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="Search" cellpadding="0" cellspacing="0">
+                    <tbody>
+                        <tr class="heading">
+                            <td>
+                                <h3>Images</h3>
+                            </td>
+                            <td>
+                                <h3>Part Number</h3>
+                            </td>
+                            <td>
+                                <h3>Part Name</h3>
+                            </td>
+                            <td>
+                                <h3>Description</h3>
+                            </td>
+                            <td>
+                                <h3>Quantity</h3>
+                            </td>
+                            <td>
+                                <h3>Price</h3>
+                            </td>
+                        </tr>
+
+                    <ui:repeat value="#{wishlist}" var="itemSet">
+                        <tr class="data1">
+                        <ui:fragment rendered="#{!empty itemSet.image}">
+                            <td>
+                                <div id="links" align="center">
+                                    <div class="thumbnail"
+                                         style="background-image: url('../images/ProdInfo/img_not_available.gif');
+                                                background-repeat: no-repeat;
+                                                background-size: 100px 100px;
+                                                height: 100px;
+                                                width: 100px;"
+                                    >
+                                        <h:link outcome = "../images/ProdInfo/#{itemSet.brand.brandKey}/450/#{itemSet.partNo}-450.jpg" target="_blank" >
+                                            <h:graphicImage value="../images/ProdInfo/#{itemSet.brand.brandKey}/450/#{itemSet.partNo}-450.jpg" />
+                                        </h:link>
+                                    </div>
+                                </div>
+                            </td>
+                        </ui:fragment>
+
+                        <ui:fragment rendered="#{empty itemSet.image}">
+                            <td>
+                                <img src="../#{itemSet.defaultImage}" height="100" width="100" /><br/>
+                                <h:form>
+                                    <h:commandButton action="#{inventoryBean.getImage}"
+                                                     type="submit"
+                                                     value="View Image"
+                                                     label="Submit"
+                                    >
+                                        <f:param name="image" value="#{itemSet.brand.brandKey}" />
+                                    </h:commandButton>
+                                </h:form>
+                            </td>
+                        </ui:fragment>
+                            <td>
+                                <h:outputText value="#{itemSet.partNo}" />
+                            </td>
+                            <td>
+                                <h:outputText value="#{itemSet.partName}" />
+                            </td>
+                            <td>
+                                <h:outputText value="#{itemSet.description}" />
+                            </td>
+                            <td>
+                                <h:outputText value="#{itemSet.qty}" />
+                            </td>
+                            <td>
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                $<h:outputText value="#{itemSet.retail}" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <h:form>
+                                                    <h:commandButton action="#{cartBean.wishRemove}"
+                                                                     type="submit"
+                                                                     value="- Wish List"
+                                                                     label="Submit"
+                                                    >
+                                                        <f:param name="itemId" value="#{itemSet.idItems}" />
+                                                    </h:commandButton>
+                                                </h:form>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </ui:repeat>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <p>
+            <small>&nbsp;</small>
+        </p>
+
+    </ui:composition>
+</html>

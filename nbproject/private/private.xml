@@ -3,20 +3,23 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/src/recomm/src/java/model/service/impl/BrandAccessSvcImpl.java</file>
-            <file>file:/E:/src/recomm/src/java/model/business/managers/AuthenticateManager.java</file>
-            <file>file:/E:/src/recomm/src/java/model/service/impl/CartAccessSvcImpl.java</file>
-            <file>file:/E:/src/recomm/web/view/orders/wishlist.jsp</file>
-            <file>file:/E:/src/recomm/web/view/auth/auth_content.xhtml</file>
-            <file>file:/E:/src/recomm/src/java/model/business/managers/beans/CartBean.java</file>
-            <file>file:/E:/src/recomm/src/java/model/business/interfaces/IInventoryManager.java</file>
-            <file>file:/E:/src/recomm/src/java/recomm.hibernate.cfg.xml</file>
-            <file>file:/E:/src/recomm/src/java/model/business/managers/beans/LoginBean.java</file>
-            <file>file:/E:/src/recomm/src/java/model/business/managers/beans/InventoryBean.java</file>
-            <file>file:/E:/src/recomm/src/java/model/service/impl/ItemAccessSvcImpl.java</file>
-            <file>file:/E:/src/recomm/src/java/hibernate.cfg.xml</file>
-            <file>file:/E:/src/recomm/src/java/model/business/managers/InventoryManager.java</file>
+            <file>file:/E:/src/recomm/src/java/com/recomm/business/managers/beans/CartBean.java</file>
+            <file>file:/E:/src/recomm/src/java/com/recomm/business/managers/impl/WishManager.java</file>
+            <file>file:/E:/src/recomm/web/orders/cart.xhtml</file>
+            <file>file:/E:/src/recomm/web/view/inventory/catalog.xhtml</file>
+            <file>file:/E:/src/recomm/web/view/orders/cart_content.xhtml</file>
+            <file>file:/E:/src/recomm/web/common/menu.xhtml</file>
+            <file>file:/E:/src/recomm/web/orders/wishlist.xhtml</file>
+            <file>file:/E:/src/recomm/src/java/com/recomm/model/domain/inventory/service/impl/WishAccessSvcImpl.java</file>
+            <file>file:/E:/src/recomm/src/java/com/recomm/business/managers/impl/AuthenticateManager.java</file>
+            <file>file:/E:/src/recomm/web/view/orders/wishlist_content.xhtml</file>
+            <file>file:/E:/src/recomm/src/java/com/recomm/model/domain/inventory/service/impl/CartAccessSvcImpl.java</file>
+            <file>file:/E:/src/recomm/src/java/com/recomm/model/domain/inventory/util/CartSearchParams.java</file>
+            <file>file:/E:/src/recomm/src/java/com/recomm/business/managers/impl/CartManager.java</file>
+            <file>file:/E:/src/recomm/src/java/com/recomm/filters/Tracking.java</file>
+            <file>file:/E:/src/recomm/src/java/com/recomm/model/domain/users/service/impl/UserAccessSvcImpl.java</file>
             <file>file:/E:/src/recomm/web/view/inventory/catalog_content.xhtml</file>
+            <file>file:/E:/src/recomm/src/java/com/recomm/model/domain/users/entity/Users.java</file>
         </group>
     </open-files>
 </project-private>

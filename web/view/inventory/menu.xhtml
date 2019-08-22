@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+>
+       
+    <ui:composition>
+    <!-- This is where the menu should go -->
+
+        <ui:fragment rendered = "#{not userBean.valid}" >
+            <table id="topics" cellspacing="0">
+                <tr>
+                    <td>
+                        <h:link class="menu" outcome="/index.xhtml" value="Home" />
+                    </td>
+                    <td>
+                        <h:link class="menu" outcome="/login.xhtml" value="Inventory (Log In)" />
+                    </td>
+                    <td>
+                        <h:link class="menu" outcome="/login.xhtml" value="Login" />
+                    </td>
+                </tr>
+            </table>
+        </ui:fragment>
+
+        <ui:fragment rendered = "#{userBean.valid}" >
+            <table id="topics" cellspacing="0">
+                <tr>
+                    <td>
+                        <h:link class="menu" outcome="/index.xhtml" value="Home" />
+                    </td>
+                    <td>
+                        <h:link class="menu" outcome="/view/inventory/inventory.xhtml" value="Manage Inventory" />
+                    </td>
+                    <td>
+                        <h:link class="menu" outcome="/logout.xhtml" value="Logout" />
+                    </td>
+                </tr>
+            </table>
+        </ui:fragment>
+    
+       <!-- end menu -->
+    </ui:composition>
+       
+</html>

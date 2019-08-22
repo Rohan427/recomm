@@ -17,11 +17,11 @@
     </context-param>
     <filter>
         <filter-name>Tracking</filter-name>
-        <filter-class>filters.Tracking</filter-class>
+        <filter-class>com.recomm.filters.Tracking</filter-class>
     </filter>
     <filter>
         <filter-name>Security</filter-name>
-        <filter-class>filters.Security</filter-class>
+        <filter-class>com.recomm.filters.Security</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>Security</filter-name>
@@ -37,11 +37,11 @@
     </filter-mapping>
     <listener>
         <description>sessionListener</description>
-        <listener-class>listeners.SessionListener</listener-class>
+        <listener-class>com.recomm.listeners.SessionListener</listener-class>
     </listener>
     <listener>
         <description>contextListener</description>
-        <listener-class>listeners.ContextListener</listener-class>
+        <listener-class>com.recomm.listeners.ContextListener</listener-class>
     </listener>
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -58,7 +58,7 @@
     </servlet>
     <servlet>
         <servlet-name>stdErr</servlet-name>
-        <servlet-class>model.business.error.stdErr</servlet-class>
+        <servlet-class>com.recomm.servlets.stdErr</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>

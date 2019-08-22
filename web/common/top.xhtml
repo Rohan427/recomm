@@ -1,39 +1,49 @@
-<?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui"
 >
     <ui:composition>
-            <table id="logoheader" cellspacing="0">
+        <table id="logoheader" cellspacing="0">
             <tr>
                 <td id="logo">
-                    <a href="index.xhtml"><img src="images/rl-logo3-bluebevel1.png" 
-                                              alt="ReComm e-Commerce" 
-                                         />
+                    <a href="index.xhtml"><img src="images/rl-logo3-bluebevel1.png"
+                                            alt="ReComm e-Commerce"
+                                           />
                     </a><br />
                 </td>
+
                 <td class="company_name">
                     <p class="text_randomlogic">ReComm: e-Commerce #{param.pageTitle}</p>
                 </td>
+
                 <td class="company_name">
                     <h1>
-                        <ui:fragment rendered = "#{userBean.valid}" >
-                            <p>
-                                Welcome #{userBean.userName}
-                            </p>
-                        </ui:fragment>
-                        <ui:fragment rendered = "#{not userBean.valid}" >
-                            <p>
-                                Welcome Guest
-                            </p>
-                       </ui:fragment>
+                <ui:fragment rendered = "#{userBean.valid}" >
+                        <p>
+                            Welcome #{userBean.userName}
+                        </p>
+                </ui:fragment>
+
+                <ui:fragment rendered = "#{not userBean.valid}" >
+                        <p>
+                            Welcome Guest
+                        </p>
+                </ui:fragment>
                     </h1>
+                </td>
+
+                <td class="company_name">
+                <ui:fragment rendered = "#{userBean.valid}" >
+                    <a href="orders/wishlist.xhtml">Wish List</a>
+                </ui:fragment>
+                </td>
+
+                <td class="company_name">
+                    <a href="orders/cart.xhtml">Shopping Cart</a>
                 </td>
             </tr>
         </table>
     </ui:composition>
 </html>
-

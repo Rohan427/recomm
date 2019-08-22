@@ -1,6 +1,7 @@
 package model.business.managers;
 
-import model.business.interfaces.IInventoryManager;
+import com.recomm.business.managers.impl.InventoryManager;
+import com.recomm.business.managers.interfaces.IInventoryManager;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeAll;

@@ -5,6 +5,7 @@
 
 package model.service.impl;
 
+import com.recomm.model.domain.inventory.service.impl.BrandAccessSvcImpl;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,9 +13,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import model.domain.inventory.Manufacturer;
-import model.service.dao.HashedObjectWrapper;
-import model.domain.interfaces.IDomainObject;
+import com.recomm.model.domain.inventory.entity.Manufacturer;
+import com.recomm.model.service.beans.HashedObjectWrapper;
+import com.recomm.model.domain.interfaces.IDomainObject;
+import com.recomm.model.domain.inventory.interfaces.IBrand;
 import java.security.SecureRandom;
 import java.util.Date;
 import utility.RandomString;
@@ -22,7 +24,7 @@ import utility.RandomString;
 public class BrandAccessSvcImplTest
 {
 	private BrandAccessSvcImpl brandSvc;
-	private Manufacturer brand;
+	private IBrand brand;
 	private HashedObjectWrapper hashtable;
 
 	@BeforeAll
